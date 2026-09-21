@@ -1,0 +1,11 @@
+.git
+.github
+dist
+node_modules
+docs
+test
+deploy/compose.yaml
+*.md
+!README.md
+.gitignore
+.editorconfig

@@ -1,0 +1,21 @@
+{
+  "name": "stdmeal",
+  "version": "1.0.0",
+  "description": "stdmeal - kompilator promptow na jedzenie. Klikasz, co masz w lodowce i na co masz ochote, dostajesz gotowy prompt do ChatGPT / Claude / Gemini.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "homepage": "https://github.com/Cake343/stdmeal",
+  "repository": { "type": "git", "url": "https://github.com/Cake343/stdmeal.git" },
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "node tools/serve.mjs src",
+    "build": "node tools/build.mjs",
+    "preview": "node tools/build.mjs && node tools/serve.mjs dist",
+    "test": "node --test",
+    "check": "npm run test && npm run build"
+  },
+  "keywords": ["prompt", "meal-planning", "llm", "homelab", "oakloud", "static-site"],
+  "dependencies": {},
+  "devDependencies": {}
+}
