@@ -164,6 +164,35 @@ chip jest czarny. Ikony interfejsu odwrotnie: rysowane `currentColor`,
 żeby dziedziczyły kolor tekstu. Test pilnuje tego rozdziału i wywala się,
 jeśli ikona UI dostanie zapieczony kolor.
 
+### 3.8. Dwa błędy, które wyszły dopiero w CI
+
+Obraz Dockera nie dał się zweryfikować lokalnie (demon wyłączony), więc
+weryfikacja przeniosła się do CI. I dobrze, bo znalazła dwie rzeczy:
+
+**`.dockerignore` kontra testy w buildzie.** Dockerfile celowo uruchamia
+`node --test` w etapie budowania, żeby zepsuty commit nie zamienił się
+w obraz. Tyle że `.dockerignore` wykluczał katalog `test/` — odruchowo,
+bo „testy nie są potrzebne w obrazie". Build padał na `"/test": not found`.
+Testy rzeczywiście nie trafiają do finalnego obrazu, ale muszą być
+w **kontekście** budowania. Plik ma teraz komentarz, żeby nikt (łącznie ze mną
+za pół roku) tego nie „posprzątał" z powrotem.
+
+**`add_header` w nginksie nie dokłada, tylko zastępuje.** To klasyczna pułapka:
+nagłówki z bloku `server` są dziedziczone przez `location` **tylko wtedy, gdy
+ten location nie ma żadnego własnego `add_header`**. Wystarczy jeden, żeby
+wszystkie odziedziczone zniknęły.
+
+W konfiguracji był osobny `location = /index.html` ustawiający samo
+`Cache-Control`. Efekt: strona główna — czyli jedyna strona w tej aplikacji —
+szła bez CSP, bez `X-Content-Type-Options`, bez niczego. Konfiguracja wyglądała
+poprawnie i przechodziła `nginx -t`.
+
+Wyłapał to dopiero test dymny kontenera dopisany do CI, który odpytuje
+uruchomioną instancję i sprawdza nagłówki w odpowiedzi. Test powstał
+dosłownie commit wcześniej — i od razu się zwrócił.
+
+Ten sam test sprawdza przy okazji, że proces w kontenerze nie ma uid 0.
+
 ## 4. Chronologia
 
 | # | Etap | Efekt |
@@ -178,6 +207,7 @@ jeśli ikona UI dostanie zapieczony kolor.
 | 8 | 80 testów w 5 plikach | złapany błąd `sanitize()` |
 | 9 | Docker, nginx, compose, CI | 3 workflow'y, obraz multi-arch |
 | 10 | Dokumentacja | README, ADR-y, ten plik |
+| 11 | Publikacja i CI | repo publiczne, obraz w GHCR, dwa błędy złapane przez CI |
 
 ## 5. Liczby
 
@@ -200,12 +230,16 @@ Uczciwa lista, żeby nie było niespodzianek:
   podłączone, więc strony nie widziałem na oczy. Logika, okablowanie i reakcje
   są przetestowane automatycznie, ale rozmiary, odstępy i zachowanie przy
   wąskim ekranie to rzeczy do obejrzenia na żywo.
-- **Buildu obrazu Dockera.** Demon nie działał (`dockerDesktopLinuxEngine`
-  nieuruchomiony). Dockerfile, `nginx.conf` i `compose.yaml` są napisane
-  i przeczytane, ale nie uruchomione. Pierwszy `docker compose up -d --build`
-  jest jednocześnie pierwszym testem.
-- **GitHub Pages.** Workflow jest gotowy, ale Pages trzeba raz włączyć
-  w ustawieniach repozytorium (Settings → Pages → Source: GitHub Actions).
+- ~~**Buildu obrazu Dockera.**~~ Nadrobione: lokalny demon nie działał,
+  więc weryfikacja poszła do CI. Każdy push buduje obraz, odpala `nginx -t`,
+  startuje kontener i sprawdza `/healthz`, treść strony, nagłówki
+  bezpieczeństwa i to, że proces nie chodzi jako root. Po drodze wyszły
+  dwa prawdziwe błędy (patrz 3.8). Obraz jest publiczny:
+  `docker pull ghcr.io/cake343/stdmeal:latest` — sprawdzone anonimowo.
+- **GitHub Pages.** Workflow jest gotowy, ale celowo odpala się wyłącznie
+  ręcznie. Publiczny adres w internecie to decyzja właściciela, a nie efekt
+  uboczny pusha. Żeby włączyć: Settings → Pages → Source: GitHub Actions,
+  potem Actions → Pages → Run workflow.
 
 ## 7. Co dalej (gdyby kiedyś wrócić)
 
