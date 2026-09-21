@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="96" height="96" role="img" aria-label="stdmeal">
+  <title>stdmeal</title>
+  <rect width="24" height="24" rx="6" fill="#0b0b0c"/>
+  <path d="m6.6 8.4 3.6 3.6-3.6 3.6" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="12.6" y="13.6" width="5.4" height="2.4" rx="1.2" fill="#ee7f2d"/>
+</svg>
