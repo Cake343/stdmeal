@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>stdmeal — kompilator promptów na jedzenie</title>
+    <meta
+      name="description"
+      content="Klikasz, co masz w lodówce i na co masz ochotę. Dostajesz gotowy prompt do ChatGPT, Claude albo Gemini. Bez konta, bez backendu, bez wysyłania czegokolwiek."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230b0b0c'/%3E%3Cpath d='m6.6 8.4 3.6 3.6-3.6 3.6' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='12.6' y='13.6' width='5.4' height='2.4' rx='1.2' fill='%23ee7f2d'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="src/css/tokens.css" />
+    <link rel="stylesheet" href="src/css/base.css" />
+    <link rel="stylesheet" href="src/css/layout.css" />
+    <link rel="stylesheet" href="src/css/components.css" />
+  </head>
+
+  <body>
+    <a class="skip" href="#form">Przejdź do formularza</a>
+
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand__logo" viewBox="0 0 24 24" role="img" aria-label="Logo stdmeal">
+          <rect class="logo-bg" width="24" height="24" rx="6" />
+          <path
+            class="logo-fg"
+            d="m6.6 8.4 3.6 3.6-3.6 3.6"
+            fill="none"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <rect class="logo-cursor" x="12.6" y="13.6" width="5.4" height="2.4" rx="1.2" />
+        </svg>
+        <div class="brand__text">
+          <h1 class="brand__name">stdmeal</h1>
+          <p class="brand__tag"><span class="dim">$</span> hunger | stdmeal &gt; chatgpt</p>
+        </div>
+      </div>
+
+      <nav class="topbar__actions" aria-label="Akcje">
+        <button id="btn-theme" class="iconbtn iconbtn--theme" type="button" title="Motyw">
+          <span class="iconbtn__sun" data-icon="sun"></span>
+          <span class="iconbtn__moon" data-icon="moon"></span>
+        </button>
+        <button id="btn-share" class="iconbtn" type="button" title="Skopiuj link z ustawieniami">
+          <span data-icon="link"></span>
+        </button>
+        <button id="btn-export" class="iconbtn" type="button" title="Zapisz ustawienia do pliku">
+          <span data-icon="download"></span>
+        </button>
+        <button id="btn-import" class="iconbtn" type="button" title="Wczytaj ustawienia z pliku">
+          <span data-icon="plus"></span>
+        </button>
+        <button id="btn-reset" class="iconbtn" type="button" title="Wyczyść wszystko">
+          <span data-icon="reset"></span>
+        </button>
+        <button id="btn-help" class="iconbtn" type="button" title="Skróty klawiszowe (?)">
+          <span data-icon="keyboard"></span>
+        </button>
+        <a
+          class="iconbtn"
+          href="https://github.com/Cake343/stdmeal"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Kod na GitHubie"
+        >
+          <span data-icon="github"></span>
+        </a>
+      </nav>
+    </header>
+
+    <main class="layout">
+      <div class="col col--form">
+        <section class="presets" aria-labelledby="presets-title">
+          <div class="presets__head">
+            <h2 class="section__title" id="presets-title">
+              <span class="section__hash">##</span>
+              <span class="section__num">00</span>
+              <span class="section__name">tryby</span>
+            </h2>
+            <button id="btn-random" class="btn btn--ghost btn--sm" type="button">
+              <span data-icon="dice"></span> zaskocz mnie
+            </button>
+          </div>
+          <p class="section__hint">Ustawienia na jeden klik. Doklejają się do tego, co już masz.</p>
+          <div class="presets__list" id="presets"></div>
+        </section>
+
+        <div id="form"></div>
+
+        <footer class="foot">
+          <p>
+            <strong>stdmeal</strong> — an <span class="dim">oakloud</span> thing ·
+            <span id="year">2026</span> ·
+            <a href="https://github.com/Cake343/stdmeal" rel="noopener noreferrer">źródła</a>
+          </p>
+          <p class="dim">
+            Wszystko dzieje się w Twojej przeglądarce. Żaden składnik nie opuszcza tego urządzenia,
+            dopóki sam nie wkleisz promptu do czatu.
+          </p>
+        </footer>
+      </div>
+
+      <aside class="col col--out">
+        <div class="out" id="output">
+          <header class="out__head">
+            <h2 class="section__title">
+              <span class="section__hash">##</span>
+              <span class="section__name">prompt</span>
+            </h2>
+            <span class="out__stats" id="stats"></span>
+          </header>
+
+          <textarea
+            id="prompt"
+            class="out__text"
+            readonly
+            spellcheck="false"
+            aria-label="Wygenerowany prompt — kliknij i naciśnij Ctrl+A, żeby zaznaczyć"
+          ></textarea>
+
+          <div class="out__actions">
+            <button id="btn-copy" class="btn btn--primary" type="button">
+              <span data-icon="copy"></span> kopiuj prompt
+            </button>
+            <button id="btn-select" class="btn" type="button">zaznacz wszystko</button>
+            <button id="btn-download" class="btn" type="button">.md</button>
+          </div>
+
+          <p class="out__hint">
+            Wklej do ChatGPT, Claude albo Gemini. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> kopiuje bez
+            odrywania rąk od klawiatury.
+          </p>
+        </div>
+      </aside>
+    </main>
+
+    <div class="mobilebar">
+      <button id="btn-copy-mobile" class="btn btn--primary btn--wide" type="button">
+        <span data-icon="copy"></span> kopiuj prompt
+      </button>
+    </div>
+
+    <dialog id="help" class="dialog">
+      <div class="dialog__head">
+        <h2 class="section__title">
+          <span class="section__hash">##</span>
+          <span class="section__name">skróty</span>
+        </h2>
+        <button id="help-close" class="iconbtn" type="button" title="Zamknij">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <dl class="keys">
+        <dt><kbd>Ctrl</kbd>+<kbd>Enter</kbd></dt>
+        <dd>skopiuj prompt do schowka</dd>
+        <dt><kbd>Ctrl</kbd>+<kbd>K</kbd></dt>
+        <dd>skocz do wyszukiwarki w lodówce</dd>
+        <dt><kbd>Esc</kbd></dt>
+        <dd>wyczyść wyszukiwarkę / zamknij to okno</dd>
+        <dt><kbd>?</kbd></dt>
+        <dd>to okno</dd>
+      </dl>
+      <p class="dialog__note">
+        Ustawienia zapisują się same w przeglądarce. Ikonka łańcucha u góry robi link, który
+        przenosi cały wyklikany stan na inne urządzenie.
+      </p>
+    </dialog>
+
+    <script type="module" src="src/js/main.js"></script>
+  </body>
+</html>

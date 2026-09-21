@@ -1,0 +1,165 @@
+/*
+ * base.css — reset, typografia, elementy natywne.
+ * Nic tu nie wie o ukladzie strony ani o komponentach.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--t-base);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+a:hover {
+  text-decoration-color: var(--accent);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+svg {
+  display: block;
+}
+
+/* Rozmiar ikon: jeden uchwyt dla wszystkich <use> ze sprite'a. */
+.ico {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 6px;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dim {
+  color: var(--fg-dim);
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+/* Widoczny, spojny focus — tylko dla klawiatury. */
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Logo dziedziczy motyw: kwadrat w kolorze tekstu, strzalka w kolorze tla. */
+.logo-bg {
+  fill: var(--fg);
+}
+
+.logo-fg {
+  stroke: var(--bg);
+}
+
+.logo-cursor {
+  fill: var(--accent);
+}
+
+/* Pasek przewijania — dyskretny, w kolorach motywu. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 3px solid var(--bg);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Link „przejdz do tresci" — widoczny dopiero po tabulacji. */
+.skip {
+  position: fixed;
+  top: var(--s-2);
+  left: var(--s-2);
+  z-index: 100;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--fg);
+  border-radius: var(--r);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  transform: translateY(-200%);
+  transition: transform var(--fast);
+}
+
+.skip:focus-visible {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}
