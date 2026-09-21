@@ -22,8 +22,48 @@ env:
   IMAGE: ${{ github.repository }}
 
 jobs:
+  # Najpierw sprawdzamy, czy kontener w ogóle wstaje i odpowiada. Sam `docker
+  # build` tego nie gwarantuje — konfiguracja nginksa jest czytana dopiero przy
+  # starcie, więc literówka w niej przechodzi build i wywala się u użytkownika.
+  smoke:
+    name: Czy kontener działa
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zbuduj lokalnie
+        run: docker build -t stdmeal:smoke .
+
+      - name: Konfiguracja nginksa jest poprawna
+        run: docker run --rm stdmeal:smoke nginx -t
+
+      - name: Kontener odpowiada
+        run: |
+          docker run -d --name smoke -p 8080:8080 stdmeal:smoke
+          for i in $(seq 1 20); do
+            curl -fsS http://localhost:8080/healthz >/dev/null 2>&1 && break
+            sleep 1
+          done
+
+          echo "→ /healthz"
+          test "$(curl -fsS http://localhost:8080/healthz)" = "ok"
+
+          echo "→ strona się serwuje"
+          curl -fsS http://localhost:8080/ | grep -q 'stdmeal'
+
+          echo "→ nagłówki bezpieczeństwa"
+          curl -fsSI http://localhost:8080/ | grep -qi 'content-security-policy'
+          curl -fsSI http://localhost:8080/ | grep -qi 'x-content-type-options'
+
+          echo "→ kontener nie chodzi jako root"
+          test "$(docker exec smoke id -u)" != "0"
+
+          docker rm -f smoke
+
   image:
     name: Zbuduj obraz
+    needs: smoke
     runs-on: ubuntu-latest
 
     steps:
