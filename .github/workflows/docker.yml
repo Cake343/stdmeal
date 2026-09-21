@@ -50,7 +50,9 @@ jobs:
           test "$(curl -fsS http://localhost:8080/healthz)" = "ok"
 
           echo "→ strona się serwuje"
-          curl -fsS http://localhost:8080/ | grep -q 'stdmeal'
+          curl -fsS http://localhost:8080/ -o page.html
+          grep -q 'stdmeal' page.html
+          grep -q '<style>' page.html
 
           echo "→ nagłówki bezpieczeństwa"
           curl -fsSI http://localhost:8080/ | grep -qi 'content-security-policy'
