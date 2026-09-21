@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Testy i build
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 20 to minimum z package.json, 22 to wersja z obrazu Dockera.
+        node: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      # Brak zależności, więc nie ma czego instalować — od razu testy.
+      - name: Testy
+        run: node --test
+
+      - name: Build do jednego pliku
+        run: node tools/build.mjs
+
+      - name: Podsumowanie rozmiaru
+        run: |
+          SIZE=$(du -h dist/index.html | cut -f1)
+          echo "### stdmeal zbudowany :hamburger:" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- \`dist/index.html\`: **$SIZE**" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Node: **${{ matrix.node }}**" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Zachowaj artefakt
+        if: matrix.node == 22
+        uses: actions/upload-artifact@v4
+        with:
+          name: stdmeal-dist
+          path: dist/index.html
+          retention-days: 14

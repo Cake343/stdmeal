@@ -1,0 +1,56 @@
+# stdmeal — uruchomienie w homelabie.
+#
+#   docker compose up -d --build     # zbuduj lokalnie i wystartuj
+#   docker compose pull && up -d     # albo weź gotowy obraz z GHCR
+#
+# Potem: http://localhost:8080
+#
+# Aplikacja nie ma backendu, bazy ani stanu na serwerze — wszystkie ustawienia
+# siedzą w localStorage przeglądarki. Dlatego nie ma tu ani jednego wolumenu:
+# kontener jest w pełni jednorazowy.
+
+name: stdmeal
+
+services:
+  stdmeal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/cake343/stdmeal:latest
+    container_name: stdmeal
+    restart: unless-stopped
+
+    ports:
+      # zmień lewą stronę, jeśli 8080 jest już zajęte na hoście
+      - "8080:8080"
+
+    # Obraz bazowy chodzi jako uid 101, więc nic z tego nie wymaga roota.
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+    # nginx potrzebuje miejsca na bufory i plik pid
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+    labels:
+      # dla tych, którzy trzymają homelab za Traefikiem — odkomentuj i dostosuj
+      # - "traefik.enable=true"
+      # - "traefik.http.routers.stdmeal.rule=Host(`stdmeal.oakloud.lan`)"
+      # - "traefik.http.services.stdmeal.loadbalancer.server.port=8080"
+      - "com.oakloud.app=stdmeal"
