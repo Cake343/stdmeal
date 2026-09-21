@@ -1,15 +1,19 @@
 # Publikuje zbudowany jeden plik na GitHub Pages.
 #
-# Uwaga: żeby to zadziałało, trzeba raz włączyć Pages w ustawieniach repo
-# (Settings → Pages → Source: GitHub Actions). Bez tego workflow poleci
-# na czerwono na ostatnim kroku — i to jedyna rzecz, której nie da się
-# ustawić z poziomu repozytorium.
+# Celowo TYLKO ręcznie (workflow_dispatch). Aplikacja docelowo chodzi
+# w Dockerze w domowym labie, a Pages to publiczny adres w internecie —
+# to decyzja, którą podejmuje się świadomie, a nie przy okazji pusha.
+#
+# Żeby włączyć:
+#   1. Settings → Pages → Source: GitHub Actions
+#   2. Actions → Pages → Run workflow
+#
+# Od tego momentu można dopisać tu wyzwalacz `push`, jeśli wersja
+# publiczna ma nadążać za main.
 
 name: Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
