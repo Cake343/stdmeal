@@ -1,11 +1,26 @@
+# Co NIE trafia do kontekstu builda.
+#
+# Uwaga na katalog `test/` — jego tu NIE MA i nie może być. Dockerfile
+# uruchamia testy w etapie budowania (`RUN node --test`), więc wykluczenie
+# testów wywala build z komunikatem `"/test": not found`.
+# (Tak, dokładnie tak się to skończyło za pierwszym razem.)
+
 .git
+.gitignore
+.gitattributes
 .github
+.editorconfig
+
+# wynik builda powstaje w środku obrazu, nie kopiujemy go z hosta
 dist
 node_modules
+
+# dokumentacja i grafika do README — aplikacji nie są potrzebne
 docs
-test
-deploy/compose.yaml
+assets
 *.md
-!README.md
-.gitignore
-.editorconfig
+
+# rzeczy do uruchamiania, nie do budowania
+compose.yaml
+compose.override.yaml
+.env
