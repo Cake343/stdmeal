@@ -7,7 +7,7 @@
 **`$ hunger | stdmeal > chatgpt`**
 
 Kompilator promptów na jedzenie. Klikasz, co masz w lodówce i na co masz ochotę —
-dostajesz gotowy prompt do wklejenia w ChatGPT, Claude albo Gemini.
+dostajesz gotowy prompt do wklejenia w ChatGPT albo innego ajaja.
 
 *an oakloud thing*
 
@@ -36,26 +36,32 @@ backendu — prompt kopiujesz i wklejasz tam, gdzie akurat masz subskrypcję.
 
 ```
 ┌──────────────────────────────────────────┬─────────────────────────┐
-│  ## 00 tryby            [🎲 zaskocz mnie]│  ## prompt    1247 zn.  │
+│  ## 00 tryby            [zaskocz mnie]   │  ## prompt    1247 zn.  │
 │  ┌────────────┐ ┌────────────┐           │ ┌─────────────────────┐ │
 │  │ Głodny     │ │ Tydzień    │  …        │ │ # Rola              │ │
 │  │ teraz      │ │ na zapas   │           │ │ Jesteś doświadczo…  │ │
 │  └────────────┘ └────────────┘           │ │                     │ │
 │                                          │ │ # Zadanie           │ │
 │  ## 05 lodówka i spiżarnia               │ │ Ułóż plan jedzenia  │ │
-│  🔍 szukaj: pomidor, ser, kasza…      12 │ │ na 5 dni.           │ │
+│  szukaj: pomidor, ser, kasza…     12     │ │ na 5 dni.           │ │
 │  warzywa                                 │ │ Gotuję dla 2 osób.  │ │
-│  [🍅 pomidory][🥒 ogórek ][🫑 papryka ]  │ │                     │ │
-│  [🧅 cebula  ][🧄 czosnek][🥔 ziemniak]  │ │ ## Moja lodówka…    │ │
+│  [pomidory][ogórek ][papryka ]           │ │                     │ │
+│  [cebula  ][czosnek][ziemniak]           │ │ ## Moja lodówka…    │ │
 │  nabiał i jaja                           │ │ - Warzywa: pomido…  │ │
-│  [🥚 jajka   ][🥛 mleko  ][🧀 ser     ]  │ └─────────────────────┘ │
+│  [jajka   ][mleko  ][ser     ]           │ └─────────────────────┘ │
 │                                          │ [kopiuj prompt][zaznacz]│
 └──────────────────────────────────────────┴─────────────────────────┘
 ```
 
 *(w prawdziwej aplikacji te ikonki to własne, płaskie SVG — nie emoji)*
 
-## Jak uruchomić
+## Przygotuj swój pierwszy plan!
+1. Wejdź na [cake343.github.io/stdmeal/](https://cake343.github.io/stdmeal/)
+2. Wprowadź swoje preferencje
+3. Skopiuj prompt
+4. Wklej prompt do wybranego czatu Ai
+
+## Jak uruchomić u siebie?
 
 ### Docker (tak to u mnie chodzi)
 
