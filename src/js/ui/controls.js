@@ -194,11 +194,24 @@ function toggle(field, store) {
   };
 }
 
+/**
+ * Uwaga w ramce — pokazuje sie tylko wtedy, gdy ustawienia sie nie spinaja
+ * (np. „gotuj tylko z tego, co mam" przy pustej lodowce). Widocznosc obsluguje
+ * zwykle `when` ze schematu, wiec ten renderer nie ma wlasnego stanu.
+ */
+function note(field) {
+  return {
+    el: h('p.note', { text: field.text }),
+    sync() {},
+  };
+}
+
 const RENDERERS = {
   segmented,
   chips,
   stepper,
   people,
+  note,
   switch: toggle,
   text: (field, store) => textInput(field, store, false),
   textarea: (field, store) => textInput(field, store, true),
@@ -217,17 +230,36 @@ export function renderSections(root, sections, store) {
 
   for (const section of sections) {
     const body = h('div.section__body');
+
+    // Licznik przy tytule: ile rzeczy jest w tej sekcji zaznaczonych.
+    // Widac go przy przewijaniu, wiec nie trzeba wracac i sprawdzac.
+    const countedPaths = section.fields
+      .filter((field) => field.path && (field.type === 'chips' || field.type === 'pantry'))
+      .map((field) => field.path);
+    const counter = countedPaths.length > 0 ? h('span.section__count') : null;
+
     const element = h('section.section', { id: `sec-${section.id}` }, [
       h('header.section__head', {}, [
         h('h2.section__title', {}, [
           h('span.section__hash', { text: '##' }),
           h('span.section__num', { text: section.num }),
           h('span.section__name', { text: section.title }),
+          counter,
         ]),
         section.hint ? h('p.section__hint', { text: section.hint }) : null,
       ]),
       body,
     ]);
+
+    if (counter) {
+      syncers.push((state) => {
+        const total = countedPaths.reduce(
+          (sum, path) => sum + (getPath(state, path)?.length ?? 0),
+          0
+        );
+        counter.textContent = total > 0 ? `· ${total}` : '';
+      });
+    }
 
     for (const field of section.fields) {
       const renderer = RENDERERS[field.type];

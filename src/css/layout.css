@@ -77,10 +77,13 @@
   min-width: 0;
 }
 
+/* Rytm pionowy: odstep MIEDZY kartami jest mniejszy niz padding wewnatrz
+   nich. Dzieki temu karta czyta sie jako jedna calosc, a nie jako trzy
+   przypadkowe rzeczy plywajace w bieli. */
 .col--form {
   display: flex;
   flex-direction: column;
-  gap: var(--s-6);
+  gap: var(--s-4);
 }
 
 /* Prawa kolumna trzyma sie ekranu. */

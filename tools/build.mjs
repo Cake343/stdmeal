@@ -19,8 +19,9 @@
  * dynamicznych i cykli miedzy modulami.
  */
 
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, posix, relative, resolve } from 'node:path';
+import { copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -180,10 +181,37 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
   await writeFile(OUT_FILE, out, 'utf8');
 
+  // —— PWA: manifest, service worker i ikony obok strony ——
+  //
+  // Te pliki MUSZĄ leżeć osobno — service worker z definicji jest oddzielnym
+  // plikiem (jego zasięg wyznacza katalog, w którym się znajduje), a manifest
+  // i ikony muszą mieć własne adresy. Sam `index.html` pozostaje
+  // samowystarczalny: bez tych plików działa, tylko nie da się go zainstalować.
+  const buildId = createHash('sha256').update(out).digest('hex').slice(0, 8);
+  const swSource = await readFile(resolve(ROOT, 'sw.js'), 'utf8');
+  const sw = swSource.replace('__STDMEAL_VERSION__', `${version}-${buildId}`);
+  if (sw === swSource) {
+    throw new Error('[build] nie podmieniłem wersji w sw.js — znacznik __STDMEAL_VERSION__ zniknął');
+  }
+  await writeFile(resolve(OUT_DIR, 'sw.js'), sw, 'utf8');
+
+  await copyFile(resolve(ROOT, 'manifest.webmanifest'), resolve(OUT_DIR, 'manifest.webmanifest'));
+
+  const iconsDir = resolve(ROOT, 'assets/pwa');
+  const icons = (await readdir(iconsDir)).filter((name) => name.endsWith('.png'));
+  if (icons.length === 0) {
+    throw new Error('[build] brak ikon PWA — uruchom `npm run icons`');
+  }
+  await mkdir(resolve(OUT_DIR, 'assets/pwa'), { recursive: true });
+  for (const icon of icons) {
+    await copyFile(resolve(iconsDir, icon), resolve(OUT_DIR, 'assets/pwa', icon));
+  }
+
   const kb = (Buffer.byteLength(out, 'utf8') / 1024).toFixed(1);
   console.log(
     `[build] dist/index.html — ${kb} kB, ${modules.size} modułów, ${cssLinks.length} arkuszy CSS, ${Date.now() - started} ms`
   );
+  console.log(`[build] PWA — manifest, sw.js (${version}-${buildId}), ${icons.length} ikon`);
 }
 
 main().catch((error) => {

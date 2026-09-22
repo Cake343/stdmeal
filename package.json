@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "node tools/serve.mjs src",
     "build": "node tools/build.mjs",
+    "icons": "node tools/icons.mjs",
     "preview": "node tools/build.mjs && node tools/serve.mjs dist",
     "test": "node --test",
     "check": "npm run test && npm run build"

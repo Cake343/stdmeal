@@ -54,6 +54,14 @@ jobs:
           grep -q 'stdmeal' page.html
           grep -q '<style>' page.html
 
+          echo "→ PWA: manifest, service worker i ikony"
+          curl -fsS http://localhost:8080/manifest.webmanifest -o manifest.json
+          node -e "JSON.parse(require('fs').readFileSync('manifest.json','utf8'))"
+          curl -fsSI http://localhost:8080/manifest.webmanifest | grep -qi 'application/manifest+json'
+          curl -fsS http://localhost:8080/sw.js | grep -q "const VERSION = '"
+          curl -fsS http://localhost:8080/assets/pwa/icon-512.png -o icon.png
+          test "$(stat -c%s icon.png)" -gt 1000
+
           echo "→ nagłówki bezpieczeństwa"
           curl -fsSI http://localhost:8080/ | grep -qi 'content-security-policy'
           curl -fsSI http://localhost:8080/ | grep -qi 'x-content-type-options'

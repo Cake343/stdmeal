@@ -17,7 +17,7 @@
 
 .section,
 .presets {
-  padding: var(--s-5);
+  padding: var(--s-45);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--surface);
@@ -47,6 +47,13 @@
   font-weight: 600;
 }
 
+/* Licznik zaznaczen przy tytule sekcji. */
+.section__count {
+  color: var(--fg-dim);
+  font-size: var(--t-xs);
+  font-weight: 400;
+}
+
 .section__hint {
   margin-top: var(--s-1);
   color: var(--fg-muted);
@@ -56,8 +63,8 @@
 .section__body {
   display: flex;
   flex-direction: column;
-  gap: var(--s-5);
-  margin-top: var(--s-5);
+  gap: var(--s-45);
+  margin-top: var(--s-4);
 }
 
 /* —— pole formularza ———————————————————————————————————————— */
@@ -80,6 +87,17 @@
    wyrownujemy do tekstu, a nie do lewej krawedzi. */
 .field--switch .field__hint {
   margin-left: calc(38px + var(--s-3));
+}
+
+/* Uwaga pojawiajaca sie tylko wtedy, gdy ustawienia sie nie spinaja. */
+.note {
+  padding: var(--s-3);
+  border: 1px solid var(--warn);
+  border-radius: var(--r);
+  background: var(--accent-soft);
+  color: var(--warn);
+  font-size: var(--t-sm);
+  line-height: 1.5;
 }
 
 /* —— chipy (wielokrotny wybor) ——————————————————————————————— */

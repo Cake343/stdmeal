@@ -193,6 +193,46 @@ dosłownie commit wcześniej — i od razu się zwrócił.
 
 Ten sam test sprawdza przy okazji, że proces w kontenerze nie ma uid 0.
 
+## 3.9. Druga tura: rytm, PWA i Pages
+
+Po pierwszym obejrzeniu aplikacji na żywo padła diagnoza: **odstępy między
+sekcjami nie grają**. Słusznie — między ostatnim polem jednej karty a pierwszym
+polem następnej było 80 px (24 padding + 32 przerwa + 24 padding). Karty
+pływały w bieli zamiast czytać się jako bloki.
+
+Poprawka to jedna zasada typograficzna: **odstęp między kartami musi być
+mniejszy niż padding wewnątrz nich**. Przerwa zeszła z 32 na 16 px, padding
+z 24 na 20, a nagłówek sekcji przykleił się bliżej treści (16 zamiast 24).
+Teraz karta jest wizualnie jedną rzeczą.
+
+**Ikony PWA bez zależności.** Manifest wymaga PNG-ów 192 i 512 (SVG Chrome
+traktuje po macoszemu). Kanoniczne rozwiązanie to `sharp` albo `resvg` — czyli
+30 MB binarki po to, żeby cztery razy narysować trzy kształty. Zamiast tego
+powstał `tools/icons.mjs`: rasteryzer liczący pokrycie piksela 16 próbkami
+(siatka 4×4, stąd gładkie krawędzie) plus ręczny enkoder PNG — sygnatura,
+IHDR, IDAT przez wbudowany `zlib`, IEND, z własną tablicą CRC-32. 200 linii,
+zero zależności, ikony generują się w ćwierć sekundy.
+
+**Cache w trybie deweloperskim.** Service worker, który cache'uje wszystko,
+zamienia `npm run dev` w koszmar: edytujesz moduł, odświeżasz, widzisz starą
+wersję. Stąd jedna linijka w `sw.js`, która wyklucza z cache ścieżki
+zawierające `/src/`. W produkcji i tak nie istnieją — to jeden plik.
+
+**`add_header` po raz drugi.** Manifest musi jechać jako
+`application/manifest+json`, czyli potrzebuje własnego bloku `location`.
+Pułapka z sekcji 3.8 czaiła się dokładnie w tym samym miejscu — gdyby ten blok
+dostał jakikolwiek `add_header`, manifest straciłby nagłówki bezpieczeństwa.
+Blok jest więc celowo pusty poza `default_type`, z komentarzem wyjaśniającym
+dlaczego. Test dymny sprawdza teraz i typ MIME, i nagłówki.
+
+**Test, który przechodził z niewłaściwego powodu.** Przy okazji licznika
+zaznaczeń wyszło, że helper testowy `chip('eggs')` szukał po całym dokumencie —
+a `eggs` występuje dwa razy: jako produkt w lodówce i jako alergen. Test
+„reset czyści lodówkę" klikał w rzeczywistości alergen, a asercja na słowo
+„jajka" w prompcie i tak przechodziła, bo obie rzeczy produkują to samo słowo.
+W aplikacji to nie jest błąd (inne ścieżki stanu), ale w teście — tak.
+Helper szuka teraz wyłącznie w sekcji spiżarni.
+
 ## 4. Chronologia
 
 | # | Etap | Efekt |
@@ -208,12 +248,13 @@ Ten sam test sprawdza przy okazji, że proces w kontenerze nie ma uid 0.
 | 9 | Docker, nginx, compose, CI | 3 workflow'y, obraz multi-arch |
 | 10 | Dokumentacja | README, ADR-y, ten plik |
 | 11 | Publikacja i CI | repo publiczne, obraz w GHCR, dwa błędy złapane przez CI |
+| 12 | Rytm, tryb „cały dzień", PWA, Pages | 92 testy, instalowalna aplikacja offline |
 
 ## 5. Liczby
 
 ```
-kod źródłowy      ~3 830 linii (JS + CSS + HTML)
-testy             ~1 270 linii, 80 testów, 3,2 s
+kod źródłowy      ~3 900 linii (JS + CSS + HTML)
+testy             ~1 500 linii, 92 testy, 3,2 s
 narzędzia         259 linii (bundler + serwer dev)
 zależności        0
 ikony             86 (70 jedzenia + 16 interfejsu), rysowane ręcznie
@@ -236,10 +277,14 @@ Uczciwa lista, żeby nie było niespodzianek:
   bezpieczeństwa i to, że proces nie chodzi jako root. Po drodze wyszły
   dwa prawdziwe błędy (patrz 3.8). Obraz jest publiczny:
   `docker pull ghcr.io/cake343/stdmeal:latest` — sprawdzone anonimowo.
-- **GitHub Pages.** Workflow jest gotowy, ale celowo odpala się wyłącznie
-  ręcznie. Publiczny adres w internecie to decyzja właściciela, a nie efekt
-  uboczny pusha. Żeby włączyć: Settings → Pages → Source: GitHub Actions,
-  potem Actions → Pages → Run workflow.
+- ~~**GitHub Pages.**~~ Włączone i przestawione na źródło „GitHub Actions",
+  więc wdrażana jest **zbudowana** wersja z `dist/` (jeden plik + PWA),
+  a nie surowe źródła. Każdy push na main aktualizuje
+  [cake343.github.io/stdmeal](https://cake343.github.io/stdmeal/).
+- **Instalacji PWA na prawdziwym telefonie.** Manifest, ikony i service worker
+  są sprawdzane automatycznie (wymiary PNG-ów, typy MIME, strategia cache),
+  ale „czy Chrome na Androidzie faktycznie pokaże przycisk instalacji"
+  weryfikuje się dopiero telefonem w ręku.
 
 ## 7. Co dalej (gdyby kiedyś wrócić)
 

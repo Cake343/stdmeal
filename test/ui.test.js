@@ -28,7 +28,19 @@ await import('../src/js/main.js');
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
 const prompt = () => $('#prompt').value;
-const chip = (id) => $$('.chip').find((node) => node.dataset.id === id);
+/**
+ * Chip produktu w lodówce — szukany WYŁĄCZNIE w sekcji spiżarni.
+ *
+ * Identyfikatory powtarzają się między słownikami: `eggs` to zarówno produkt
+ * („jajka" w lodówce), jak i alergen („jajka" w sekcji diety). W aplikacji to
+ * żaden problem, bo siedzą pod innymi ścieżkami stanu — ale wyszukiwanie po
+ * całym dokumencie trafiało w ten pierwszy z brzegu i test potrafił przejść
+ * z zupełnie innego powodu, niż się wydawało.
+ */
+const chip = (id) =>
+  $('#sec-pantry')
+    .querySelectorAll('.chip')
+    .find((node) => node.dataset.id === id);
 
 test('aplikacja wstaje i renderuje wszystkie sekcje', () => {
   assert.equal($('#form').children.length, SECTIONS.length);
@@ -178,6 +190,41 @@ test('reset wymaga dwoch klikniec', () => {
   $('#btn-reset').click();
   assert.doesNotMatch(prompt(), /jajka/);
   assert.match(prompt(), /na cały dzień/, 'wrocilismy do ustawien domyslnych');
+});
+
+test('licznik przy tytule sekcji liczy zaznaczenia', () => {
+  const clear = $('.pantry__bar').querySelector('.btn');
+  clear.click(); // zaczynamy od pustej lodówki, cokolwiek zostało po testach wyżej
+
+  const counter = $('#sec-pantry').querySelector('.section__count');
+  assert.equal(counter.textContent, '');
+
+  chip('tomato').click();
+  chip('eggs').click();
+  assert.equal(counter.textContent, '· 2');
+
+  chip('eggs').click();
+  assert.equal(counter.textContent, '· 1');
+});
+
+test('ostrzeżenie wyskakuje przy „tylko z tego, co mam" i pustej lodówce', () => {
+  const note = $('#sec-pantry').querySelector('.note');
+  const mode = (id) => $$('.seg__item').find((node) => node.dataset.id === id);
+
+  assert.equal(note.hidden, true, 'domyślnie ukryte');
+
+  mode('only').click();
+  assert.equal(note.hidden, true, 'w lodówce coś jest, więc wszystko się spina');
+
+  $('.pantry__bar').querySelector('.btn').click();
+  assert.equal(note.hidden, false, 'pusta lodówka + tryb „tylko z tego" = ostrzeżenie');
+
+  chip('rice').click();
+  assert.equal(note.hidden, true, 'znika, gdy tylko coś zaznaczysz');
+
+  chip('rice').click();
+  mode('prefer').click();
+  assert.equal(note.hidden, true, 'zmiana trybu też je chowa');
 });
 
 test('ustawienia trafiaja do localStorage', async () => {

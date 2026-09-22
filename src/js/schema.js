@@ -125,6 +125,16 @@ export const SECTIONS = [
         label: 'Jak to traktować',
         options: PANTRY_MODES,
       },
+      {
+        type: 'note',
+        text:
+          'Wybrałeś „tylko z tego, co mam", ale lodówka jest pusta — ' +
+          'model nie będzie miał z czego gotować. Zaznacz produkty albo zmień tryb.',
+        when: (state) =>
+          state.pantryMode === 'only' &&
+          state.pantry.length === 0 &&
+          state.pantryExtra.trim() === '',
+      },
     ],
   },
   {

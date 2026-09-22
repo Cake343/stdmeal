@@ -1,19 +1,16 @@
-# Publikuje zbudowany jeden plik na GitHub Pages.
+# Publikuje aplikację na GitHub Pages — to jest główny sposób jej używania.
 #
-# Celowo TYLKO ręcznie (workflow_dispatch). Aplikacja docelowo chodzi
-# w Dockerze w domowym labie, a Pages to publiczny adres w internecie —
-# to decyzja, którą podejmuje się świadomie, a nie przy okazji pusha.
+# Wdrażany jest ZBUDOWANY katalog dist/: jeden plik HTML plus manifest,
+# service worker i ikony. Dzięki temu publiczna wersja to dokładnie to samo,
+# co jedzie w kontenerze, i da się ją zainstalować jako aplikację.
 #
-# Żeby włączyć:
-#   1. Settings → Pages → Source: GitHub Actions
-#   2. Actions → Pages → Run workflow
-#
-# Od tego momentu można dopisać tu wyzwalacz `push`, jeśli wersja
-# publiczna ma nadążać za main.
+# Wymaga raz ustawionego źródła: Settings → Pages → Source: GitHub Actions.
 
 name: Pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

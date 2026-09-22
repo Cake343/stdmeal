@@ -20,7 +20,7 @@ dostajesz gotowy prompt do wklejenia w ChatGPT albo innego ajaja.
 
 ---
 
-## Po co to jest
+## Po co to jest?
 
 I tak co kilka dni pytam jakieś AI, co ugotować. I tak za każdym razem piszę to samo:
 ile osób, ile mam czasu, co mam w lodówce, czego nie jem, jak ma wyglądać odpowiedź.
@@ -53,13 +53,18 @@ backendu — prompt kopiujesz i wklejasz tam, gdzie akurat masz subskrypcję.
 └──────────────────────────────────────────┴─────────────────────────┘
 ```
 
-*(w prawdziwej aplikacji te ikonki to własne, płaskie SVG — nie emoji)*
-
 ## Przygotuj swój pierwszy plan!
 1. Wejdź na [cake343.github.io/stdmeal/](https://cake343.github.io/stdmeal/)
 2. Wprowadź swoje preferencje
 3. Skopiuj prompt
 4. Wklej prompt do wybranego czatu Ai
+
+> **Zainstaluj to sobie.** stdmeal jest aplikacją PWA: w Chrome kliknij ikonę
+> instalacji w pasku adresu, na Androidzie „Dodaj do ekranu głównego", na iOS
+> Udostępnij → „Do ekranu początkowego". Dostajesz ikonę, własne okno bez
+> paska przeglądarki i **działanie bez internetu** — bo cała aplikacja jest
+> jednym plikiem, który siedzi w pamięci podręcznej. Przytrzymanie ikony daje
+> skróty prosto do trybów „Głodny teraz", „Cały dzień" i „Tydzień na zapas".
 
 ## Jak uruchomić u siebie?
 
@@ -89,9 +94,10 @@ siedzą w `localStorage` przeglądarki.
 
 ```bash
 npm run dev       # http://localhost:5173, źródła na żywo
-npm test          # 80 testów, bez instalowania czegokolwiek
-npm run build     # dist/index.html — jeden plik, zero zależności
-npm run preview   # zbudowany plik przez lokalny serwer
+npm test          # 92 testy, bez instalowania czegokolwiek
+npm run build     # dist/ — jeden plik HTML + manifest, sw.js i ikony PWA
+npm run preview   # zbudowana wersja przez lokalny serwer
+npm run icons     # przerysuj ikony PWA (tylko gdy zmienia się logo)
 ```
 
 ### Jeden plik na pendrive
@@ -101,20 +107,25 @@ JavaScript i wszystkie ikony w jednym pliku. Można go otworzyć dwuklikiem
 (`file://`), wrzucić na dowolny hosting statyczny albo skopiować na inny komputer.
 Działa bez internetu.
 
-## Co potrafi
+Obok niego build kładzie jeszcze `manifest.webmanifest`, `sw.js` i ikony —
+te trzy rzeczy są potrzebne tylko do instalacji jako aplikacja. Sam `index.html`
+działa bez nich.
+
+## Co potrafi?
 
 | | |
 |---|---|
 | **9 sekcji** | plan, czas i sprzęt, ochota, dieta i zakazy, lodówka, zakupy, makro, format odpowiedzi, uwagi |
 | **63 produkty** | z wyszukiwarką odporną na ogonki — „zolty ser" znajdzie „ser żółty" |
-| **6 trybów** | „Głodny teraz", „Tydzień na zapas", „Resztki z lodówki", „Fit", „Goście", „Lunch do pracy" |
+| **7 trybów** | „Głodny teraz", **„Cały dzień"**, „Tydzień na zapas", „Resztki z lodówki", „Fit", „Goście", „Lunch do pracy" |
 | **PL / EN** | interfejs zawsze po polsku, prompt do wyboru |
 | **Zapis stanu** | sam się zapamiętuje, eksport do JSON-a, link przenoszący ustawienia na inne urządzenie |
 | **Skróty** | `Ctrl+Enter` kopiuje, `Ctrl+K` skacze do wyszukiwarki, `?` pokazuje pomoc |
 | **Motywy** | jasny, ciemny, za systemem |
+| **PWA** | instaluje się, działa offline, skróty pod ikoną aplikacji |
 | **Prywatność** | zero requestów, zero telemetrii, zero cookies |
 
-## Jak to działa w środku
+## Jak to działa w środku?
 
 Przepływ danych jest jednokierunkowy i celowo nudny:
 
@@ -155,9 +166,11 @@ stdmeal/
 │       ├── schema.js       deklaratywny opis formularza
 │       ├── state.js        niezmienny store + sanityzacja
 │       └── main.js         spięcie całości
-├── test/                   80 testów (node:test, zero zależności)
+├── test/                   92 testy (node:test, zero zależności)
 │   └── helpers/mini-dom.js atrapa DOM-u — aplikacja startuje w Node
-├── tools/                  build.mjs (własny bundler) + serve.mjs
+├── manifest.webmanifest    PWA: nazwa, ikony, skróty
+├── sw.js                   service worker — offline i aktualizacje
+├── tools/                  build.mjs (bundler), icons.mjs (PNG bez zależności), serve.mjs
 ├── deploy/nginx.conf       konfiguracja serwera w obrazie
 ├── Dockerfile              build w Node → nginx bez roota
 └── docs/                   worklog i decyzje

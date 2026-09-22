@@ -1,0 +1,58 @@
+{
+  "name": "stdmeal — kompilator promptów na jedzenie",
+  "short_name": "stdmeal",
+  "description": "Klikasz, co masz w lodówce i na co masz ochotę. Dostajesz gotowy prompt do ChatGPT, Claude albo Gemini.",
+  "lang": "pl",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "id": "/stdmeal/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "categories": ["food", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "assets/pwa/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/pwa/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/pwa/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Głodny teraz",
+      "short_name": "Teraz",
+      "description": "Jeden posiłek, 15 minut, z tego co jest w domu",
+      "url": "./?tryb=now",
+      "icons": [{ "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Cały dzień",
+      "short_name": "Dzień",
+      "description": "Śniadanie, obiad i kolacja na jeden dzień",
+      "url": "./?tryb=fullday",
+      "icons": [{ "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Tydzień na zapas",
+      "short_name": "Tydzień",
+      "description": "Siedem dni i jedna lista zakupów",
+      "url": "./?tryb=week",
+      "icons": [{ "src": "assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

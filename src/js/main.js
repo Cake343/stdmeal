@@ -12,7 +12,7 @@
  * synchronizuje swoj wyglad ze stanem.
  */
 
-import { PRESETS } from './data/presets.js';
+import { PRESETS, PRESETS_BY_ID } from './data/presets.js';
 import { CUISINES, MOODS } from './data/options.js';
 import { spriteMarkup, foodIcon, uiIcon } from './icons.js';
 import {
@@ -36,9 +36,16 @@ document.body.insertAdjacentHTML('afterbegin', spriteMarkup());
 
 const store = createStore(initialState());
 
-// Link ze stanem juz odczytany — czyscimy adres, zeby odswiezenie strony
-// nie cofalo zmian do wersji z linku.
-if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+// Skroty z manifestu PWA (dlugie przytrzymanie ikony aplikacji) wchodza
+// jako ?tryb=now. Preset doklada sie do wczytanego stanu, tak samo jak klik.
+const requestedPreset = new URLSearchParams(location.search).get('tryb');
+if (requestedPreset && PRESETS_BY_ID[requestedPreset]) {
+  store.patch(PRESETS_BY_ID[requestedPreset].patch);
+}
+
+// Link ze stanem i parametr trybu sa juz odczytane — czyscimy adres, zeby
+// odswiezenie strony nie cofalo zmian do wersji z linku.
+if (location.hash || location.search) history.replaceState(null, '', location.pathname);
 
 // ——— formularz ————————————————————————————————————————————————
 
@@ -227,4 +234,34 @@ if (year) year.textContent = String(new Date().getFullYear());
 // Ikony w miejscach, ktore w HTML-u sa tylko szkieletem.
 for (const node of document.querySelectorAll('[data-icon]')) {
   node.innerHTML = uiIcon(node.dataset.icon);
+}
+
+// ——— PWA ——————————————————————————————————————————————————————
+
+/**
+ * Service worker rejestrujemy tylko po HTTP(S) — przy otwarciu jednego pliku
+ * z dysku (file://) przegladarka i tak by go odrzucila, a w konsoli zostalby
+ * brzydki blad. Kolejnosc warunkow ma znaczenie: najpierw sprawdzamy nawigator,
+ * bo w srodowisku testowym `location` jest atrapa bez protokolu.
+ */
+if ('serviceWorker' in (globalThis.navigator ?? {}) && String(location.protocol).startsWith('http')) {
+  navigator.serviceWorker
+    .register('./sw.js')
+    .then((registration) => {
+      registration.addEventListener('updatefound', () => {
+        const fresh = registration.installing;
+        if (!fresh) return;
+
+        fresh.addEventListener('statechange', () => {
+          // `controller` istnieje tylko wtedy, gdy cos juz dzialalo wczesniej —
+          // czyli to aktualizacja, a nie pierwsza instalacja.
+          if (fresh.state === 'installed' && navigator.serviceWorker.controller) {
+            toast('Jest nowa wersja — odśwież stronę');
+          }
+        });
+      });
+    })
+    .catch(() => {
+      // Brak service workera to nie powod, zeby aplikacja przestala dzialac.
+    });
 }

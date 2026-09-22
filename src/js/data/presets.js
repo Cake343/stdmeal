@@ -24,6 +24,24 @@ export const PRESETS = [
     },
   },
   {
+    id: 'fullday',
+    pl: 'Cały dzień',
+    hint: 'Śniadanie, obiad i kolacja na jeden dzień. Plus przekąska.',
+    icon: 'egg',
+    patch: {
+      scope: 'day',
+      meals: ['breakfast', 'dinner', 'supper', 'snack'],
+      time: '30',
+      effort: 'normal',
+      pantryMode: 'prefer',
+      shopping: { allowed: true },
+      output: {
+        parts: ['plan', 'recipes', 'amounts', 'shopping', 'timings', 'swaps'],
+        length: 'normal',
+      },
+    },
+  },
+  {
     id: 'week',
     pl: 'Tydzień na zapas',
     hint: 'Siedem dni, jedna lista zakupów, gotowanie z wyprzedzeniem.',
