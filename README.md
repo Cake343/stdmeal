@@ -94,7 +94,7 @@ siedzą w `localStorage` przeglądarki.
 
 ```bash
 npm run dev       # http://localhost:5173, źródła na żywo
-npm test          # 92 testy, bez instalowania czegokolwiek
+npm test          # 94 testy, bez instalowania czegokolwiek
 npm run build     # dist/ — jeden plik HTML + manifest, sw.js i ikony PWA
 npm run preview   # zbudowana wersja przez lokalny serwer
 npm run icons     # przerysuj ikony PWA (tylko gdy zmienia się logo)
@@ -117,11 +117,12 @@ działa bez nich.
 |---|---|
 | **9 sekcji** | plan, czas i sprzęt, ochota, dieta i zakazy, lodówka, zakupy, makro, format odpowiedzi, uwagi |
 | **63 produkty** | z wyszukiwarką odporną na ogonki — „zolty ser" znajdzie „ser żółty" |
-| **7 trybów** | „Głodny teraz", **„Cały dzień"**, „Tydzień na zapas", „Resztki z lodówki", „Fit", „Goście", „Lunch do pracy" |
+| **8 trybów** | „Głodny teraz", **„Tryb ADHD"**, **„Cały dzień"**, „Tydzień na zapas", „Resztki z lodówki", „Fit", „Goście", „Lunch do pracy" |
 | **PL / EN** | interfejs zawsze po polsku, prompt do wyboru |
 | **Zapis stanu** | sam się zapamiętuje, eksport do JSON-a, link przenoszący ustawienia na inne urządzenie |
 | **Skróty** | `Ctrl+Enter` kopiuje, `Ctrl+K` skacze do wyszukiwarki, `?` pokazuje pomoc |
 | **Motywy** | jasny, ciemny, za systemem |
+| **Tryb ADHD** | jedno danie bez alternatyw, jeden krok = jedna czynność, jawne przerwy, minimum zmywania |
 | **PWA** | instaluje się, działa offline, skróty pod ikoną aplikacji |
 | **Prywatność** | zero requestów, zero telemetrii, zero cookies |
 
@@ -166,7 +167,7 @@ stdmeal/
 │       ├── schema.js       deklaratywny opis formularza
 │       ├── state.js        niezmienny store + sanityzacja
 │       └── main.js         spięcie całości
-├── test/                   92 testy (node:test, zero zależności)
+├── test/                   94 testy (node:test, zero zależności)
 │   └── helpers/mini-dom.js atrapa DOM-u — aplikacja startuje w Node
 ├── manifest.webmanifest    PWA: nazwa, ikony, skróty
 ├── sw.js                   service worker — offline i aktualizacje

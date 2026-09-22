@@ -204,6 +204,14 @@ export const SECTIONS = [
       { type: 'segmented', path: 'lang', label: 'Język promptu', options: LANGS },
       {
         type: 'switch',
+        path: 'output.focus',
+        label: 'Tryb ADHD — jedno danie, jeden krok naraz',
+        hint:
+          'Bez alternatyw i bez „w międzyczasie zrób…". Najpierw wszystko wyjmij, ' +
+          'potem gotuj. Z jawnymi przerwami i minimum zmywania.',
+      },
+      {
+        type: 'switch',
         path: 'output.askFirst',
         label: 'Niech najpierw dopyta (max 3 pytania)',
       },

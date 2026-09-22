@@ -111,6 +111,28 @@ test('dopytanie i „bez lania wody" sa opcjonalne', () => {
   assert.match(chatty, /Bez wstępów/);
 });
 
+test('tryb ADHD dokłada osobną sekcję o sposobie pisania przepisu', () => {
+  const off = compile(defaultState());
+  assert.doesNotMatch(off, /Jak mam to dostać/);
+
+  const on = compile(withState({ output: { focus: true } }));
+  assert.match(on, /# Jak mam to dostać/);
+  assert.match(on, /\*\*dokładnie jedno\*\* danie/);
+  assert.match(on, /Jeden numerowany krok = jedna czynność/);
+  assert.match(on, /ile minut mam wolne/);
+
+  // Ma stać między formatem a zasadami — najpierw „co", potem „jak", na końcu „czego nie".
+  assert.ok(on.indexOf('# Format odpowiedzi') < on.indexOf('# Jak mam to dostać'));
+  assert.ok(on.indexOf('# Jak mam to dostać') < on.indexOf('# Zasady'));
+});
+
+test('tryb ADHD po angielsku też działa', () => {
+  const text = compile(withState({ lang: 'en', output: { focus: true } }));
+  assert.match(text, /# How I need this written/);
+  assert.match(text, /\*\*exactly one\*\* dish/);
+  assert.doesNotMatch(text, /Jak mam to dostać/);
+});
+
 test('angielski prompt jest naprawde angielski', () => {
   const text = compile(withState({ lang: 'en', pantry: ['tomato'], diets: ['vegan'] }));
 

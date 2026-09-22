@@ -113,6 +113,17 @@ const pl = {
       'Zanim ułożysz plan, zadaj mi maksymalnie 3 pytania o rzeczy, których naprawdę nie da się zgadnąć. Potem od razu odpowiedz.',
     noFluff: 'Bez wstępów, podsumowań i komplementów — zacznij od razu od treści.',
   },
+  focus: {
+    heading: 'Jak mam to dostać',
+    lines: [
+      'Zaproponuj **dokładnie jedno** danie. Żadnych alternatyw, żadnego „albo możesz…" — wybór mam już za sobą.',
+      'Zacznij od listy rzeczy, które mam wyjąć i przygotować, ZANIM cokolwiek włączę.',
+      'Jeden numerowany krok = jedna czynność. Nigdy „w międzyczasie zrób X" — nie rób ze mnie wielowątkowca.',
+      'Przy każdym kroku, w którym coś się samo gotuje, napisz wprost: ile minut mam wolne i czy mogę odejść.',
+      'Ogranicz liczbę naczyń i sprzętu do minimum — zmywanie jest częścią gotowania.',
+      'Napisz, po czym poznać, że krok jest skończony (kolor, zapach, czas), a nie tylko „aż będzie gotowe".',
+    ],
+  },
   meta: (date) => `Wygenerowane w stdmeal · ${date}`,
 };
 
@@ -207,6 +218,17 @@ const en = {
     askFirst:
       'Before writing the plan, ask me at most 3 questions about things you genuinely cannot guess. Then answer right away.',
     noFluff: 'No intros, no summaries, no compliments — start with the content.',
+  },
+  focus: {
+    heading: 'How I need this written',
+    lines: [
+      'Propose **exactly one** dish. No alternatives, no "or you could…" — I have already spent my decision budget.',
+      'Start with everything I should take out and prepare BEFORE turning anything on.',
+      'One numbered step = one action. Never "meanwhile, do X" — do not make me multitask.',
+      'For every step where something cooks on its own, say plainly how many minutes I have free and whether I can walk away.',
+      'Keep the number of pots, pans and dishes to a minimum — washing up is part of cooking.',
+      'Say how I can tell a step is done (colour, smell, time), not just "until ready".',
+    ],
   },
   meta: (date) => `Generated with stdmeal · ${date}`,
 };

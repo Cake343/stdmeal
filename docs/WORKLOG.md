@@ -233,6 +233,34 @@ a `eggs` występuje dwa razy: jako produkt w lodówce i jako alergen. Test
 W aplikacji to nie jest błąd (inne ścieżki stanu), ale w teście — tak.
 Helper szuka teraz wyłącznie w sekcji spiżarni.
 
+## 3.10. Tryb ADHD — czyli wymaganie wobec tekstu, nie wobec dania
+
+Prośba brzmiała krótko: „Tryb ADHD?". Ciekawe było to, że **nie dało się tego
+zrobić zwykłym presetem**. Wszystkie dotychczasowe tryby ustawiają, CO ma
+powstać — ile dni, jakie posiłki, jaki klimat. Tu chodzi o coś innego:
+o sposób, w jaki przepis ma być napisany.
+
+Konkretnie o zdjęcie obciążenia z funkcji wykonawczych:
+
+- **dokładnie jedno danie**, bez alternatyw — wybór jest kosztem, nie prezentem,
+- **wszystko wyjmij zanim cokolwiek włączysz** — czyli mise en place jako
+  osobny, pierwszy krok,
+- **jeden krok = jedna czynność**, nigdy „w międzyczasie zrób X" — równoległość
+  to dokładnie to miejsce, w którym obiad się przypala,
+- **jawne przerwy**: „masz teraz 8 minut wolnego, możesz odejść",
+- **minimum naczyń**, bo zmywanie jest częścią gotowania i częścią kosztu,
+- **po czym poznać, że krok jest skończony** — kolor, zapach, czas, a nie
+  „aż będzie gotowe".
+
+Architektonicznie wylądowało to jako flaga `output.focus` i **osobna sekcja
+promptu** („Jak mam to dostać"), wstawiona między „Format odpowiedzi" a
+„Zasady": najpierw co, potem jak, na końcu czego nie. Preset „Tryb ADHD"
+tylko ją włącza i dokłada rozsądne ustawienia (15 minut, jedna patelnia,
+maksymalnie 3 rzeczy do dokupienia).
+
+Flaga jest celowo **trwała** — nie wyłącza jej wybór innego trybu. To nie jest
+ustawienie „na ten jeden obiad", tylko preferencja tego, jak się czyta przepisy.
+
 ## 4. Chronologia
 
 | # | Etap | Efekt |
@@ -248,13 +276,14 @@ Helper szuka teraz wyłącznie w sekcji spiżarni.
 | 9 | Docker, nginx, compose, CI | 3 workflow'y, obraz multi-arch |
 | 10 | Dokumentacja | README, ADR-y, ten plik |
 | 11 | Publikacja i CI | repo publiczne, obraz w GHCR, dwa błędy złapane przez CI |
-| 12 | Rytm, tryb „cały dzień", PWA, Pages | 92 testy, instalowalna aplikacja offline |
+| 12 | Rytm, tryb „cały dzień", PWA, Pages | instalowalna aplikacja offline |
+| 13 | Tryb ADHD | 94 testy, osobna sekcja promptu o sposobie pisania przepisu |
 
 ## 5. Liczby
 
 ```
 kod źródłowy      ~3 900 linii (JS + CSS + HTML)
-testy             ~1 500 linii, 92 testy, 3,2 s
+testy             ~1 540 linii, 94 testy, 3,2 s
 narzędzia         259 linii (bundler + serwer dev)
 zależności        0
 ikony             86 (70 jedzenia + 16 interfejsu), rysowane ręcznie

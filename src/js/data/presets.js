@@ -24,6 +24,28 @@ export const PRESETS = [
     },
   },
   {
+    id: 'adhd',
+    pl: 'Tryb ADHD',
+    hint: 'Jedno danie, jedna patelnia, jeden krok naraz. Bez wyborów.',
+    icon: 'pan',
+    patch: {
+      scope: 'now',
+      meals: ['dinner'],
+      time: '15',
+      effort: 'lazy',
+      moods: ['onepot'],
+      pantryMode: 'prefer',
+      shopping: { allowed: true, maxItems: '3', budget: '' },
+      output: {
+        parts: ['recipes', 'amounts', 'timings'],
+        length: 'short',
+        askFirst: false,
+        noFluff: true,
+        focus: true,
+      },
+    },
+  },
+  {
     id: 'fullday',
     pl: 'Cały dzień',
     hint: 'Śniadanie, obiad i kolacja na jeden dzień. Plus przekąska.',

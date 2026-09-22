@@ -61,6 +61,7 @@ export const DEFAULTS = Object.freeze({
     length: 'normal',
     askFirst: false,
     noFluff: true,
+    focus: false,
   },
   notes: '',
 });

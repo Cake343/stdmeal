@@ -175,6 +175,13 @@ export function compile(state, options = {}) {
   if (lengthNote) formatLines.push(`\n${lengthNote}`);
   if (parts.length > 0) out.push(`# ${t.headings.format}\n${formatLines.join('\n')}`);
 
+  // ——— tryb skupienia (ADHD) ———
+  // Osobna sekcja, a nie kolejne punkty w „Zasadach", bo to nie sa wymagania
+  // wobec DANIA, tylko wobec sposobu, w jaki ma byc napisany przepis.
+  if (state.output.focus) {
+    out.push(`# ${t.focus.heading}\n${t.focus.lines.map(bullet).join('\n')}`);
+  }
+
   // ——— zasady ———
   const multiDay = scope === 'days' || scope === 'week';
   const ruleLines = [
