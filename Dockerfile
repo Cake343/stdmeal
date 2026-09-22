@@ -16,8 +16,13 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 # Zero zależności = zero `npm install`. Kopiujemy tylko to, czego build dotyka.
+# Uwaga: `test/` i pliki PWA też muszą tu być — build uruchamia testy, a te
+# sprawdzają manifest oraz wymiary ikon. Brak któregokolwiek = build pada.
 COPY package.json ./
 COPY index.html ./
+COPY manifest.webmanifest ./
+COPY sw.js ./
+COPY assets ./assets
 COPY src ./src
 COPY tools ./tools
 COPY test ./test

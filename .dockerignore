@@ -15,10 +15,13 @@
 dist
 node_modules
 
-# dokumentacja i grafika do README — aplikacji nie są potrzebne
+# dokumentacja — aplikacji nie jest potrzebna
 docs
-assets
 *.md
+
+# UWAGA: `assets/` NIE MOŻE tu trafić. Siedzą w nim ikony PWA, które build
+# kopiuje do dist/, a testy sprawdzają co do piksela. To ta sama pułapka,
+# co z katalogiem test/ — patrz komentarz na górze pliku.
 
 # rzeczy do uruchamiania, nie do budowania
 compose.yaml
