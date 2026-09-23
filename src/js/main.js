@@ -13,6 +13,7 @@
  */
 
 import { PRESETS, PRESETS_BY_ID } from './data/presets.js';
+import { CATEGORY_ICONS, guessFromName } from './data/pantry.js';
 import { CUISINES, MOODS } from './data/options.js';
 import { spriteMarkup, foodIcon, uiIcon } from './icons.js';
 import {
@@ -35,6 +36,31 @@ import { debounce, h, qs } from './ui/dom.js';
 document.body.insertAdjacentHTML('afterbegin', spriteMarkup());
 
 const store = createStore(initialState());
+
+/**
+ * Migracja starego formatu: do wersji z wlasnymi produktami rzeczy spoza
+ * katalogu wpisywalo sie jako wolny tekst w polu „cos jeszcze". Rozbijamy go
+ * po przecinkach na prawdziwe produkty (z odgadnieta kategoria i ikona), zeby
+ * zapisane ustawienia i stare linki nic nie stracily.
+ */
+const legacyExtra = String(store.getPath('pantryExtra') ?? '');
+if (legacyExtra.trim()) {
+  const migrated = legacyExtra
+    .split(/[,;\n]/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .slice(0, 20)
+    .map((name) => {
+      const guess = guessFromName(name);
+      return {
+        name,
+        cat: guess?.cat ?? 'extras',
+        icon: guess?.icon ?? CATEGORY_ICONS.extras,
+      };
+    });
+
+  store.patch({ custom: [...(store.getPath('custom') ?? []), ...migrated], pantryExtra: '' });
+}
 
 // Skroty z manifestu PWA (dlugie przytrzymanie ikony aplikacji) wchodza
 // jako ?tryb=now. Preset doklada sie do wczytanego stanu, tak samo jak klik.
@@ -99,6 +125,8 @@ const statsLine = qs('#stats');
 function renderPreview(state) {
   const text = compile(state);
   preview.value = text;
+  // Tresc bywa po angielsku — bez tego czytnik ekranu przeczyta ja po polsku.
+  preview.setAttribute('lang', state.lang);
   const info = stats(text, state.lang);
   statsLine.textContent = `${info.chars} znaków · ${info.words} słów · ~${info.tokens} tokenów`;
   return text;
@@ -117,6 +145,45 @@ async function doCopy() {
 
 qs('#btn-copy').addEventListener('click', doCopy);
 qs('#btn-copy-mobile').addEventListener('click', doCopy);
+
+/**
+ * Wysyłka do czatu.
+ *
+ * ChatGPT i Claude przyjmują prompt w parametrze `?q=`, więc da się otworzyć
+ * rozmowę z gotowym tekstem. Gemini nie ma takiego parametru — tam otwieramy
+ * czysty czat.
+ *
+ * Dwie ostrożności:
+ *  1. Prompt ZAWSZE ląduje w schowku, nawet przy wysyłce linkiem. Jeśli serwer
+ *     odrzuci długi adres albo strona się przeładuje, jest co wkleić.
+ *  2. Powyżej ~6000 znaków po zakodowaniu nie próbujemy linku — to okolice,
+ *     w których serwery zaczynają zwracać 414. Wtedy otwieramy pusty czat.
+ */
+const URL_LIMIT = 6000;
+
+const CHATS = {
+  chatgpt: { name: 'ChatGPT', blank: 'https://chatgpt.com/', withPrompt: (q) => `https://chatgpt.com/?q=${q}` },
+  claude: { name: 'Claude', blank: 'https://claude.ai/new', withPrompt: (q) => `https://claude.ai/new?q=${q}` },
+  gemini: { name: 'Gemini', blank: 'https://gemini.google.com/app', withPrompt: null },
+};
+
+async function sendToChat(id) {
+  const chat = CHATS[id];
+  const text = preview.value;
+  const encoded = encodeURIComponent(text);
+  const copied = await copyText(text);
+
+  const canLink = chat.withPrompt !== null && encoded.length <= URL_LIMIT;
+  window.open(canLink ? chat.withPrompt(encoded) : chat.blank, '_blank', 'noopener,noreferrer');
+
+  if (canLink) toast(`${chat.name}: otwieram z gotowym promptem`);
+  else if (copied) toast(`${chat.name}: prompt w schowku, wklej go (Ctrl+V)`);
+  else toast(`${chat.name}: skopiuj prompt ręcznie`, 'warn');
+}
+
+for (const id of Object.keys(CHATS)) {
+  qs(`#btn-${id}`).addEventListener('click', () => sendToChat(id));
+}
 
 qs('#btn-select').addEventListener('click', () => {
   preview.focus();

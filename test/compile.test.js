@@ -192,3 +192,49 @@ test('polska odmiana przez liczebniki', () => {
   assert.equal(item(22), 'składniki', '22 wraca do formy „składniki"');
   assert.equal(item(112), 'składników');
 });
+
+test('mealprep ma własną sekcję i nie zakazuje powtórek', () => {
+  const text = compile(withState({ scope: 'prep', days: 4 }));
+
+  assert.match(text, /Gotuję raz i chcę z tego jeść przez 4 dni/);
+  assert.match(text, /# Gotowanie na zapas/);
+  assert.match(text, /ile dni wytrzyma w lodówce/);
+  assert.doesNotMatch(
+    text,
+    /Nie powtarzaj tego samego dania/,
+    'przy gotowaniu na zapas powtarzalność jest sensem, a nie wadą'
+  );
+
+  // a przy zwykłym planie na kilka dni zakaz powtórek zostaje
+  assert.match(compile(withState({ scope: 'days', days: 4 })), /Nie powtarzaj tego samego dania/);
+  assert.doesNotMatch(compile(withState({ scope: 'days' })), /# Gotowanie na zapas/);
+});
+
+test('mealprep po angielsku', () => {
+  const text = compile(withState({ lang: 'en', scope: 'prep', days: 5 }));
+  assert.match(text, /I cook once and eat from it for 5 days/);
+  assert.match(text, /# Batch cooking/);
+  assert.match(text, /how many days it keeps in the fridge/);
+});
+
+test('własne produkty wchodzą do tych samych grup co katalog', () => {
+  const text = compile(
+    withState({
+      pantry: ['tomato', 'eggs'],
+      custom: [
+        { name: 'ser kozi', cat: 'dairy', icon: 'cheese' },
+        { name: 'kimchi', cat: 'veg', icon: 'cabbage' },
+      ],
+    })
+  );
+
+  assert.match(text, /- Warzywa: pomidory, kimchi/);
+  assert.match(text, /- Nabiał i jaja: jajka, ser kozi/);
+  assert.doesNotMatch(text, /Poza tym mam/, 'własne produkty nie są już dopiskiem');
+});
+
+test('same własne produkty też tworzą sekcję lodówki', () => {
+  const text = compile(withState({ custom: [{ name: 'resztka pesto', cat: 'extras', icon: 'herbs' }] }));
+  assert.match(text, /## Moja lodówka i spiżarnia/);
+  assert.match(text, /- Dodatki i przyprawy: resztka pesto/);
+});

@@ -11,6 +11,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { CATEGORIES, PANTRY, groupPantry, normalize, searchPantry } from '../src/js/data/pantry.js';
+import * as OPTIONS_PANTRY from '../src/js/data/pantry.js';
 import * as OPTIONS from '../src/js/data/options.js';
 import { PRESETS } from '../src/js/data/presets.js';
 import { FOOD, UI } from '../src/js/icons.js';
@@ -166,4 +167,38 @@ test('groupPantry zwraca tylko niepuste grupy, w kolejnosci katalogu', () => {
   assert.deepEqual(english[0].items, ['tomatoes']);
 
   assert.deepEqual(groupPantry(['nie-ma-takiego']), []);
+});
+
+test('zgadywanie produktu z nazwy działa i wybiera najdłuższe trafienie', () => {
+  const { guessFromName, CATEGORY_ICONS, CATEGORY_ICON_CHOICES } = OPTIONS_PANTRY;
+
+  assert.equal(guessFromName('ser kozi')?.id, 'cheese');
+  assert.equal(guessFromName('mleko owsiane')?.id, 'milk');
+  assert.equal(guessFromName('MAKARON pełnoziarnisty')?.id, 'pasta');
+  assert.equal(guessFromName('łosoś wędzony')?.id, 'salmon');
+  assert.equal(
+    guessFromName('masło orzechowe')?.id,
+    'peanutbutter',
+    'dłuższe dopasowanie wygrywa z samym „masłem"'
+  );
+  assert.equal(guessFromName('kombucha'), null, 'nieznane zostaje nieznane');
+  assert.equal(guessFromName('ab'), null, 'za krótkie, żeby zgadywać');
+});
+
+test('ikony kategorii i listy do wyboru wskazują na istniejące ikony', () => {
+  const { CATEGORY_ICONS, CATEGORY_ICON_CHOICES } = OPTIONS_PANTRY;
+
+  for (const category of CATEGORIES) {
+    assert.ok(FOOD[CATEGORY_ICONS[category.id]], `kategoria ${category.id} bez ikony zastępczej`);
+
+    const choices = CATEGORY_ICON_CHOICES[category.id];
+    assert.ok(Array.isArray(choices) && choices.length >= 4, `za mało ikon do wyboru w ${category.id}`);
+    for (const icon of choices) {
+      assert.ok(FOOD[icon], `ikona "${icon}" z listy ${category.id} nie istnieje`);
+    }
+    assert.ok(
+      choices.includes(CATEGORY_ICONS[category.id]),
+      `ikona zastępcza ${category.id} powinna być na liście do przewijania`
+    );
+  }
 });

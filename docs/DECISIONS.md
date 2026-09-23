@@ -194,6 +194,82 @@ tła. Jedna zasada dla chipów, segmentów i przełączników.
 
 ---
 
+## ADR-011 · Własne produkty: pierwsze obiekty w stanie
+
+**Status:** przyjęte
+
+**Kontekst.** Do tej pory cały stan to były identyfikatory ze słowników —
+dzięki temu `sanitize()` mogło po prostu odfiltrować wszystko, czego nie ma
+w katalogu. Własne produkty (`{ nazwa, kategoria, ikona }`) łamią tę zasadę:
+nazwa jest dowolnym tekstem od użytkownika.
+
+**Decyzja.** `custom` dostaje własną gałąź w sanityzacji zamiast rozluźnienia
+reguły ogólnej. Nazwa jest przycinana do 48 znaków, kategoria musi być znana,
+ikona musi istnieć w zestawie (inaczej podstawiana jest ikona kategorii),
+duplikaty po nazwie lecą do kosza, a lista ma twardy limit 40 pozycji.
+
+Ikona wybierana jest trójstopniowo: zgadywanie z nazwy po katalogu (najdłuższe
+dopasowanie wygrywa, więc „masło orzechowe" nie zostaje masłem) → ikona
+kategorii → ręczne przewijanie ośmiu propozycji.
+
+**Konsekwencje.**
+- ✅ Link do udostępniania nadal nie przemyci niczego poza tekstem, który i tak
+  trafia wyłącznie do `textarea`.
+- ✅ Stare pole „coś jeszcze" (wolny tekst) migruje się samo przy wczytaniu —
+  rozbijane po przecinkach na prawdziwe produkty.
+- ❌ Jedna ścieżka w stanie zachowuje się inaczej niż reszta. Zamiast ukrywać
+  ten wyjątek, ma on własną funkcję i komentarz mówiący dlaczego.
+
+---
+
+## ADR-012 · Dostępność jako test, nie jako dobre chęci
+
+**Status:** przyjęte
+
+**Kontekst.** „Poprawić dostępność" to zadanie, które robi się raz i które
+po trzech zmianach w CSS cicho się cofa. Zwłaszcza kontrast: wystarczy
+rozjaśnić jeden odcień „bo ładniej wygląda".
+
+**Decyzja.** Wszystko, co da się sprawdzić maszynowo, jest sprawdzane
+w `npm test`: kontrast WCAG liczony wprost ze wzoru dla obu motywów, obecność
+nazw przy przyciskach ikonowych, wzorzec `radiogroup` z obsługą strzałek,
+jeden `<h1>`, `lang`, `prefers-reduced-motion`.
+
+**Konsekwencje.**
+- ✅ Test od razu znalazł trzy prawdziwe błędy: podpowiedzi miały kontrast
+  2,76:1, obramowania kontrolek 1,55:1, a ostrzegawcze powiadomienie w ciemnym
+  motywie 2,26:1 (biały tekst na jasnym pomarańczu).
+- ✅ Paleta jest teraz uzasadniona liczbami, a nie wyczuciem.
+- ❌ To nadal nie jest audyt dostępności. Czytnik ekranu, nawigacja klawiaturą
+  po prawdziwej stronie i test z prawdziwym użytkownikiem sprawdzają rzeczy,
+  których żaden regex nie dotknie.
+
+---
+
+## ADR-013 · Odstępy: reguła zamiast wyczucia
+
+**Status:** przyjęte
+
+**Kontekst.** Pierwsza wersja miała 80 px między treścią sąsiednich kart
+(24 padding + 32 przerwa + 24 padding). Wyglądało to jak trzy przypadkowe
+rzeczy pływające w bieli.
+
+**Decyzja.** Jedna zasada: **przerwa między kartami jest mniejsza niż padding
+w ich środku**. Do tego wszystkie `gap` i `margin` muszą pochodzić ze skali
+`--s-*`, a wysokość kontrolek z tokenu `--control` — inaczej rząd „ikona +
+pole + lista + przycisk" ma cztery różne wysokości (miał: 38, 41, 41 i 30 px).
+
+Oba warunki sprawdza `design.test.js`.
+
+**Konsekwencje.**
+- ✅ „Konsekwentne odstępy" przestają być opinią, a stają się warunkiem, który
+  albo jest spełniony, albo test jest czerwony.
+- ✅ Padding *wewnątrz* kontrolek celowo nie jest wymuszany — to strojenie
+  optyczne pod równą wysokość, a nie trafianie w siatkę 4 px.
+- ❌ Dodanie nowego rodzaju odstępu wymaga dopisania tokenu. To jest ta cena.
+
+---
+
 ## ADR-010 · Kontener: nginx bez roota, bez wolumenów
 
 **Status:** przyjęte

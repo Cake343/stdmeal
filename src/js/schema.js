@@ -42,7 +42,7 @@ export const SECTIONS = [
         label: 'Ile dni',
         min: 2,
         max: 14,
-        when: (state) => state.scope === 'days',
+        when: (state) => state.scope === 'days' || state.scope === 'prep',
       },
       { type: 'people', label: 'Dla ilu osób' },
       {
@@ -111,14 +111,9 @@ export const SECTIONS = [
     title: 'lodówka i spiżarnia',
     hint: 'Klikaj, co masz. Reszta to jest to, po co w ogóle powstała ta apka.',
     fields: [
-      { type: 'pantry', path: 'pantry', label: 'Mam w domu' },
-      {
-        type: 'textarea',
-        path: 'pantryExtra',
-        label: 'Coś jeszcze (wpisz po swojemu)',
-        placeholder: 'pół słoika pesto, resztka ryżu z wczoraj, mrożony groszek…',
-        rows: 3,
-      },
+      // `count` mowi licznikowi przy tytule sekcji, ze ma zliczyc dwie sciezki:
+      // katalog i wlasne produkty.
+      { type: 'pantry', path: 'pantry', label: 'Mam w domu', count: ['pantry', 'custom'] },
       {
         type: 'segmented',
         path: 'pantryMode',
@@ -133,6 +128,7 @@ export const SECTIONS = [
         when: (state) =>
           state.pantryMode === 'only' &&
           state.pantry.length === 0 &&
+          state.custom.length === 0 &&
           state.pantryExtra.trim() === '',
       },
     ],

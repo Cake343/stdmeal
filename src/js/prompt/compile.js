@@ -76,7 +76,9 @@ export function compile(state, options = {}) {
         ? t.task.day()
         : scope === 'week'
           ? t.task.week()
-          : t.task.days(state.days);
+          : scope === 'prep'
+            ? t.task.prep(state.days)
+            : t.task.days(state.days);
 
   const mealNames = labels(MEALS, state.meals, lang);
   const taskLines = [taskLine, t.forPeople(state.people.adults, state.people.kids)];
@@ -121,7 +123,7 @@ export function compile(state, options = {}) {
   out.push(section(t.headings.diet, dietLines));
 
   // ——— spizarnia ———
-  const groups = groupPantry(state.pantry, lang);
+  const groups = groupPantry(state.pantry, lang, state.custom);
   const extra = tidy(state.pantryExtra);
   if (groups.length > 0 || extra) {
     const pantryLines = [t.pantryIntro];
@@ -175,6 +177,12 @@ export function compile(state, options = {}) {
   if (lengthNote) formatLines.push(`\n${lengthNote}`);
   if (parts.length > 0) out.push(`# ${t.headings.format}\n${formatLines.join('\n')}`);
 
+  // ——— mealprep ———
+  // Wymagania wobec przechowywania i odgrzewania, a nie wobec samego dania.
+  if (scope === 'prep') {
+    out.push(`# ${t.prep.heading}\n${t.prep.lines.map(bullet).join('\n')}`);
+  }
+
   // ——— tryb skupienia (ADHD) ———
   // Osobna sekcja, a nie kolejne punkty w „Zasadach", bo to nie sa wymagania
   // wobec DANIA, tylko wobec sposobu, w jaki ma byc napisany przepis.
@@ -183,6 +191,8 @@ export function compile(state, options = {}) {
   }
 
   // ——— zasady ———
+  // Uwaga: mealprep celowo NIE jest tu liczony. Przy gotowaniu na zapas
+  // powtarzalnosc jest sensem calej operacji, a nie wada.
   const multiDay = scope === 'days' || scope === 'week';
   const ruleLines = [
     bullet(t.rules.noInvent),

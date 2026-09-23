@@ -94,7 +94,7 @@ siedzą w `localStorage` przeglądarki.
 
 ```bash
 npm run dev       # http://localhost:5173, źródła na żywo
-npm test          # 94 testy, bez instalowania czegokolwiek
+npm test          # 122 testy, bez instalowania czegokolwiek
 npm run build     # dist/ — jeden plik HTML + manifest, sw.js i ikony PWA
 npm run preview   # zbudowana wersja przez lokalny serwer
 npm run icons     # przerysuj ikony PWA (tylko gdy zmienia się logo)
@@ -117,12 +117,16 @@ działa bez nich.
 |---|---|
 | **9 sekcji** | plan, czas i sprzęt, ochota, dieta i zakazy, lodówka, zakupy, makro, format odpowiedzi, uwagi |
 | **63 produkty** | z wyszukiwarką odporną na ogonki — „zolty ser" znajdzie „ser żółty" |
-| **8 trybów** | „Głodny teraz", **„Tryb ADHD"**, **„Cały dzień"**, „Tydzień na zapas", „Resztki z lodówki", „Fit", „Goście", „Lunch do pracy" |
+| **Własne produkty** | dopisujesz, czego nie ma — ikonę zgaduje z nazwy („ser kozi" dostaje ikonę sera) |
+| **Wysyłka do czatu** | jeden klik otwiera ChatGPT albo Claude z wklejonym promptem |
+| **10 trybów** | „Głodny teraz", „Tryb ADHD", „Cały dzień", „Tydzień na zapas", **„Mealprep"**, **„Tryb studenta"**, „Resztki z lodówki", „Fit", „Goście", „Lunch do pracy" |
 | **PL / EN** | interfejs zawsze po polsku, prompt do wyboru |
 | **Zapis stanu** | sam się zapamiętuje, eksport do JSON-a, link przenoszący ustawienia na inne urządzenie |
 | **Skróty** | `Ctrl+Enter` kopiuje, `Ctrl+K` skacze do wyszukiwarki, `?` pokazuje pomoc |
 | **Motywy** | jasny, ciemny, za systemem |
 | **Tryb ADHD** | jedno danie bez alternatyw, jeden krok = jedna czynność, jawne przerwy, minimum zmywania |
+| **Mealprep** | gotujesz raz na N dni: kolejność sesji, ile się trzyma, co zamrozić, jak odgrzewać |
+| **Dostępność** | kontrast WCAG AA (pilnowany testem), pełna obsługa klawiaturą, etykiety dla czytników |
 | **PWA** | instaluje się, działa offline, skróty pod ikoną aplikacji |
 | **Prywatność** | zero requestów, zero telemetrii, zero cookies |
 
@@ -167,7 +171,7 @@ stdmeal/
 │       ├── schema.js       deklaratywny opis formularza
 │       ├── state.js        niezmienny store + sanityzacja
 │       └── main.js         spięcie całości
-├── test/                   94 testy (node:test, zero zależności)
+├── test/                   122 testy (node:test, zero zależności)
 │   └── helpers/mini-dom.js atrapa DOM-u — aplikacja startuje w Node
 ├── manifest.webmanifest    PWA: nazwa, ikony, skróty
 ├── sw.js                   service worker — offline i aktualizacje

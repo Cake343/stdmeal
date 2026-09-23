@@ -227,6 +227,63 @@ test('ostrzeżenie wyskakuje przy „tylko z tego, co mam" i pustej lodówce', (
   assert.equal(note.hidden, true, 'zmiana trybu też je chowa');
 });
 
+test('własny produkt: zgaduje kategorię i ikonę, dodaje się i usuwa', () => {
+  const name = $('.pantry__addname');
+  const category = $('.pantry__addcat');
+  const addButton = $('.pantry__addrow').querySelectorAll('.btn')[0];
+
+  name.value = 'ser kozi';
+  name.dispatch('input');
+  assert.equal(category.value, 'dairy', 'kategoria zgadnięta z nazwy');
+
+  addButton.click();
+  assert.match(prompt(), /Nabiał i jaja: ser kozi/);
+  assert.equal(name.value, '', 'pole czyści się po dodaniu');
+
+  const chip = $('#sec-pantry').querySelectorAll('.chip--custom')[0];
+  assert.equal(chip.dataset.name, 'ser kozi');
+  assert.ok(chip.classList.contains('is-on'), 'własny produkt jest z definicji zaznaczony');
+
+  chip.querySelector('.chip__x').click();
+  assert.doesNotMatch(prompt(), /ser kozi/);
+  assert.equal($('#sec-pantry').querySelectorAll('.chip--custom').length, 0);
+});
+
+test('własny produkt spoza katalogu ląduje w dodatkach', () => {
+  const name = $('.pantry__addname');
+  const addButton = $('.pantry__addrow').querySelectorAll('.btn')[0];
+
+  name.value = 'kombucha';
+  name.dispatch('input');
+  assert.equal($('.pantry__addcat').value, 'extras', 'nic nie pasuje — zostają dodatki');
+
+  addButton.click();
+  assert.match(prompt(), /Dodatki i przyprawy: kombucha/);
+
+  $('#sec-pantry').querySelectorAll('.chip--custom')[0].querySelector('.chip__x').click();
+});
+
+test('klikanie w podgląd przewija ikony', () => {
+  const icon = $('.pantry__addicon');
+  const before = icon.innerHTML;
+
+  icon.click();
+  assert.notEqual(icon.innerHTML, before, 'ikona się zmieniła');
+
+  // osiem propozycji na kategorię — po ośmiu kliknięciach wracamy do punktu wyjścia
+  for (let i = 0; i < 7; i += 1) icon.click();
+  assert.equal(icon.innerHTML, before, 'lista zapętla się');
+});
+
+test('pusta nazwa nie dodaje produktu', () => {
+  const name = $('.pantry__addname');
+  const addButton = $('.pantry__addrow').querySelectorAll('.btn')[0];
+
+  name.value = '   ';
+  addButton.click();
+  assert.equal($('#sec-pantry').querySelectorAll('.chip--custom').length, 0);
+});
+
 test('ustawienia trafiaja do localStorage', async () => {
   chip('rice').click();
   await new Promise((resolve) => setTimeout(resolve, 500)); // zapis jest opozniony

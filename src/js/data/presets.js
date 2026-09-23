@@ -83,6 +83,48 @@ export const PRESETS = [
     },
   },
   {
+    id: 'mealprep',
+    pl: 'Mealprep',
+    hint: 'Gotujesz raz, jesz kilka dni. Z pojemnikami i odgrzewaniem.',
+    icon: 'rice_cooker',
+    patch: {
+      scope: 'prep',
+      days: 4,
+      meals: ['dinner'],
+      time: 'any',
+      effort: 'normal',
+      moods: ['onepot'],
+      pantryMode: 'prefer',
+      shopping: { allowed: true },
+      output: {
+        parts: ['plan', 'recipes', 'amounts', 'shopping', 'aisles', 'timings', 'prep', 'leftovers'],
+        length: 'normal',
+      },
+    },
+  },
+  {
+    id: 'student',
+    pl: 'Tryb studenta',
+    hint: 'Tanio, jeden palnik i mikrofala, mało zmywania.',
+    icon: 'legumes',
+    patch: {
+      scope: 'days',
+      days: 3,
+      meals: ['dinner'],
+      time: '30',
+      effort: 'lazy',
+      moods: ['cheap', 'onepot'],
+      // Realia akademika: bez piekarnika, bez wolnowaru, bez blendera.
+      equipment: ['pan', 'pot', 'microwave'],
+      pantryMode: 'prefer',
+      shopping: { allowed: true, maxItems: '8', budget: '' },
+      output: {
+        parts: ['plan', 'recipes', 'amounts', 'shopping', 'swaps', 'leftovers'],
+        length: 'short',
+      },
+    },
+  },
+  {
     id: 'leftovers',
     pl: 'Resztki z lodówki',
     hint: 'Zero zakupów. Zużyj to, co i tak się zmarnuje.',

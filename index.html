@@ -51,27 +51,28 @@
       </div>
 
       <nav class="topbar__actions" aria-label="Akcje">
-        <button id="btn-theme" class="iconbtn iconbtn--theme" type="button" title="Motyw">
+        <button id="btn-theme" aria-label="Zmień motyw" class="iconbtn iconbtn--theme" type="button" title="Motyw">
           <span class="iconbtn__sun" data-icon="sun"></span>
           <span class="iconbtn__moon" data-icon="moon"></span>
         </button>
-        <button id="btn-share" class="iconbtn" type="button" title="Skopiuj link z ustawieniami">
+        <button id="btn-share" aria-label="Skopiuj link z ustawieniami" class="iconbtn" type="button" title="Skopiuj link z ustawieniami">
           <span data-icon="link"></span>
         </button>
-        <button id="btn-export" class="iconbtn" type="button" title="Zapisz ustawienia do pliku">
+        <button id="btn-export" aria-label="Zapisz ustawienia do pliku" class="iconbtn" type="button" title="Zapisz ustawienia do pliku">
           <span data-icon="download"></span>
         </button>
-        <button id="btn-import" class="iconbtn" type="button" title="Wczytaj ustawienia z pliku">
+        <button id="btn-import" aria-label="Wczytaj ustawienia z pliku" class="iconbtn" type="button" title="Wczytaj ustawienia z pliku">
           <span data-icon="plus"></span>
         </button>
-        <button id="btn-reset" class="iconbtn" type="button" title="Wyczyść wszystko">
+        <button id="btn-reset" aria-label="Wyczyść wszystko" class="iconbtn" type="button" title="Wyczyść wszystko">
           <span data-icon="reset"></span>
         </button>
-        <button id="btn-help" class="iconbtn" type="button" title="Skróty klawiszowe (?)">
+        <button id="btn-help" aria-label="Skróty klawiszowe" class="iconbtn" type="button" title="Skróty klawiszowe (?)">
           <span data-icon="keyboard"></span>
         </button>
         <a
           class="iconbtn"
+          aria-label="Kod źródłowy na GitHubie"
           href="https://github.com/Cake343/stdmeal"
           target="_blank"
           rel="noopener noreferrer"
@@ -114,7 +115,7 @@
         </footer>
       </div>
 
-      <aside class="col col--out">
+      <aside class="col col--out" aria-label="Wygenerowany prompt">
         <div class="out" id="output">
           <header class="out__head">
             <h2 class="section__title">
@@ -140,9 +141,16 @@
             <button id="btn-download" class="btn" type="button">.md</button>
           </div>
 
+          <div class="out__send">
+            <span class="out__sendlabel" id="send-label">wyślij do:</span>
+            <button id="btn-chatgpt" class="btn btn--sm" type="button">ChatGPT</button>
+            <button id="btn-claude" class="btn btn--sm" type="button">Claude</button>
+            <button id="btn-gemini" class="btn btn--sm" type="button">Gemini</button>
+          </div>
+
           <p class="out__hint">
-            Wklej do ChatGPT, Claude albo Gemini. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> kopiuje bez
-            odrywania rąk od klawiatury.
+            Wysyłanie otwiera czat z wklejonym promptem — a na wszelki wypadek zawsze wrzuca go
+            też do schowka. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> kopiuje bez otwierania niczego.
           </p>
         </div>
       </aside>
@@ -154,13 +162,13 @@
       </button>
     </div>
 
-    <dialog id="help" class="dialog">
+    <dialog id="help" class="dialog" aria-labelledby="help-title">
       <div class="dialog__head">
-        <h2 class="section__title">
+        <h2 class="section__title" id="help-title">
           <span class="section__hash">##</span>
           <span class="section__name">skróty</span>
         </h2>
-        <button id="help-close" class="iconbtn" type="button" title="Zamknij">
+        <button id="help-close" aria-label="Zamknij okno" class="iconbtn" type="button" title="Zamknij">
           <span data-icon="close"></span>
         </button>
       </div>

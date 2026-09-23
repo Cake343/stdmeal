@@ -13,7 +13,8 @@
  *     spreparowany link nie wstrzyknie niczego do promptu poza polami tekstowymi.
  */
 
-import { PANTRY } from './data/pantry.js';
+import { CATEGORIES, CATEGORY_ICONS, PANTRY } from './data/pantry.js';
+import { FOOD } from './icons.js';
 import {
   ALLERGENS,
   CUISINES,
@@ -52,6 +53,7 @@ export const DEFAULTS = Object.freeze({
   likes: '',
   dislikes: '',
   pantry: [],
+  custom: [],
   pantryExtra: '',
   pantryMode: 'prefer',
   shopping: { allowed: true, maxItems: '', budget: '' },
@@ -90,6 +92,10 @@ const LIMITS = {
   'people.kids': [0, 20],
   days: [1, 14],
 };
+
+/** Zbiory do szybkiego sprawdzania, uzywane przez sanitizeCustom. */
+const CATEGORY_IDS = new Set(CATEGORIES.map((category) => category.id));
+const FOOD_IDS = new Set(Object.keys(FOOD));
 
 /** Maksymalna dlugosc pol tekstowych — zeby link/localStorage nie spuchl. */
 const MAX_TEXT = 600;
@@ -135,6 +141,44 @@ function allowedIds(path) {
   return dict ? new Set(dict.map((option) => option.id)) : null;
 }
 
+/** Ile wlasnych produktow ma sens. Powyzej tego to juz nie jest lodowka. */
+const MAX_CUSTOM = 40;
+const MAX_CUSTOM_NAME = 48;
+
+/**
+ * Sanityzacja wlasnych produktow: { name, cat, icon }.
+ *
+ * Wszystkie trzy pola sa niezaufane — te dane wchodza takze z linku.
+ * Nazwa jest przycinana, kategoria musi byc znana, a ikona musi istniec
+ * w zestawie (inaczej podstawiamy ikone kategorii). Duplikaty po nazwie
+ * lecą do kosza, zeby dwa razy kliknięte „dodaj" nie robilo bliźniaków.
+ */
+function sanitizeCustom(value) {
+  if (!Array.isArray(value)) return [];
+
+  const seen = new Set();
+  const result = [];
+
+  for (const entry of value) {
+    if (entry === null || typeof entry !== 'object') continue;
+
+    const name = cleanText(entry.name).trim().slice(0, MAX_CUSTOM_NAME);
+    if (!name) continue;
+
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    const cat = CATEGORY_IDS.has(entry.cat) ? entry.cat : 'extras';
+    const icon = FOOD_IDS.has(entry.icon) ? entry.icon : (CATEGORY_ICONS[cat] ?? 'spices');
+
+    result.push({ name, cat, icon });
+    if (result.length >= MAX_CUSTOM) break;
+  }
+
+  return result;
+}
+
 /**
  * Przycina dowolne dane do ksztaltu DEFAULTS.
  * Rekurencyjnie: obiekt -> obiekt, tablica -> przefiltrowana tablica id,
@@ -146,6 +190,13 @@ export function sanitize(input, defaults = DEFAULTS, path = '') {
   for (const [key, fallback] of Object.entries(defaults)) {
     const here = path ? `${path}.${key}` : key;
     const value = input == null ? undefined : input[key];
+
+    // Wlasne produkty to jedyne miejsce, gdzie w stanie siedza obiekty,
+    // a nie id-ki ze slownika — wiec maja wlasna, scisla sanityzacje.
+    if (here === 'custom') {
+      result[key] = sanitizeCustom(value);
+      continue;
+    }
 
     if (Array.isArray(fallback)) {
       const allowed = allowedIds(here);

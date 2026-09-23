@@ -44,6 +44,9 @@ const pl = {
     day: () => 'Ułóż plan jedzenia na cały dzień.',
     days: (days) => `Ułóż plan jedzenia na ${days} ${plural(days, 'dzień', 'dni', 'dni')}.`,
     week: () => 'Ułóż plan jedzenia na cały tydzień (7 dni).',
+    prep: (days) =>
+      `Gotuję raz i chcę z tego jeść przez ${days} ${plural(days, 'dzień', 'dni', 'dni')}. ` +
+      'Zaplanuj to jako jedną sesję gotowania, nie jako osobne obiady.',
   },
   forPeople: (adults, kids) => {
     const total = adults + kids;
@@ -113,6 +116,17 @@ const pl = {
       'Zanim ułożysz plan, zadaj mi maksymalnie 3 pytania o rzeczy, których naprawdę nie da się zgadnąć. Potem od razu odpowiedz.',
     noFluff: 'Bez wstępów, podsumowań i komplementów — zacznij od razu od treści.',
   },
+  prep: {
+    heading: 'Gotowanie na zapas',
+    lines: [
+      'Ustaw kolejność tak, żeby nic nie stało bezczynnie: najpierw to, co się długo gotuje albo piecze, w przerwach reszta.',
+      'Przy każdym daniu napisz, **ile dni wytrzyma w lodówce** i co da się zamrozić.',
+      'Napisz, jak to odgrzewać, żeby nie wyszła guma — i czego nie odgrzewać wcale.',
+      'Zaznacz, co pakować osobno (sos, świeże warzywa, chrupiące dodatki).',
+      'Policz, ile porcji łącznie z tego wychodzi.',
+      'Powiedz, ile pojemników mniej więcej będzie potrzebnych.',
+    ],
+  },
   focus: {
     heading: 'Jak mam to dostać',
     lines: [
@@ -151,6 +165,9 @@ const en = {
     day: () => 'Plan my food for a full day.',
     days: (days) => `Plan my food for ${days} day${days === 1 ? '' : 's'}.`,
     week: () => 'Plan my food for a whole week (7 days).',
+    prep: (days) =>
+      `I cook once and eat from it for ${days} day${days === 1 ? '' : 's'}. ` +
+      'Plan it as a single cooking session, not as separate dinners.',
   },
   forPeople: (adults, kids) => {
     const total = adults + kids;
@@ -218,6 +235,17 @@ const en = {
     askFirst:
       'Before writing the plan, ask me at most 3 questions about things you genuinely cannot guess. Then answer right away.',
     noFluff: 'No intros, no summaries, no compliments — start with the content.',
+  },
+  prep: {
+    heading: 'Batch cooking',
+    lines: [
+      'Order the steps so nothing sits idle: start what takes longest, fill the gaps with the rest.',
+      'For every dish say **how many days it keeps in the fridge** and what can be frozen.',
+      'Say how to reheat it without turning it to rubber — and what should not be reheated at all.',
+      'Point out what to pack separately (sauce, fresh vegetables, anything crunchy).',
+      'Count the total number of portions.',
+      'Say roughly how many containers I will need.',
+    ],
   },
   focus: {
     heading: 'How I need this written',

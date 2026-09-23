@@ -261,6 +261,103 @@ maksymalnie 3 rzeczy do dokupienia).
 Flaga jest celowo **trwała** — nie wyłącza jej wybór innego trybu. To nie jest
 ustawienie „na ten jeden obiad", tylko preferencja tego, jak się czyta przepisy.
 
+## 3.11. Trzecia tura: student, mealprep, własne produkty, dostępność
+
+### Student to nie to samo co mealprep
+
+Pytanie brzmiało: „co by w ogóle tryb studenta oznaczał?". Odpowiedź: to dwie
+różne osie, które dają się łączyć.
+
+**Student** to ograniczenia sprzętu i portfela — akademik ma palnik, garnek
+i mikrofalę, nie ma piekarnika ani wolnowaru. Więc preset odznacza sprzęt,
+włącza „tanio i konkretnie", skraca odpowiedź i ogranicza dokupowanie do ośmiu
+rzeczy. To zwykły preset.
+
+**Mealprep** to zupełnie inne pytanie: *gotuję raz, jem przez N dni*. I tego
+nie dało się zrobić presetem, bo wymaga rzeczy, których nigdzie indziej nie ma:
+kolejności gotowania w jednej sesji, ile co wytrzyma w lodówce, co zamrozić,
+jak odgrzewać, co pakować osobno, ile pojemników. Dostało więc własny zakres
+(`scope: 'prep'`) i własną sekcję promptu.
+
+Przy okazji wyszedł ładny niuans: zasada „nie powtarzaj tego samego dania"
+jest przy mealprepie **szkodliwa** — powtarzalność jest sensem całej operacji.
+Więc przy tym zakresie kompilator jej nie dokłada.
+
+### Własne produkty i pytanie o ikonki
+
+Pytanie „ale jak z ikonkami wtedy?" było trafne — to jest cały problem tej
+funkcji. Wpisujesz „ser kozi", a aplikacja ma 70 ręcznie narysowanych ikon
+i żadnej dla sera koziego.
+
+Rozwiązanie trójstopniowe:
+
+1. **Zgadywanie z nazwy.** Nazwa jest porównywana z całym katalogiem (nazwy
+   polskie, angielskie i tagi, wszystko bez ogonków). „ser kozi" trafia w „ser
+   żółty" i dostaje ikonę sera. Wygrywa **najdłuższe** dopasowanie — bez tego
+   „masło orzechowe" zostałoby masłem.
+2. **Ikona kategorii**, jeśli nic nie pasuje. „Kombucha" ląduje w dodatkach
+   z ikoną przypraw.
+3. **Ręczny wybór.** Kliknięcie w podgląd przewija osiem propozycji dla danej
+   kategorii. Osiem, a nie wszystkie 70 — bo siatka z siedemdziesięcioma
+   ikonami to kolejny ekran do zaprojektowania, a osiem załatwia prawie
+   wszystko.
+
+Od strony architektury to pierwsze miejsce, gdzie w stanie siedzą **obiekty**,
+a nie identyfikatory ze słownika — czyli wyłom w zasadzie, na której stała
+cała sanityzacja. Dlatego `custom` ma własną, ciasną funkcję walidującą,
+a nie rozluźnioną regułę ogólną (ADR-011).
+
+Stare pole „coś jeszcze" zniknęło, ale jego zawartość migruje się sama:
+przy wczytaniu tekst jest rozbijany po przecinkach na prawdziwe produkty
+z odgadniętymi kategoriami. Dzięki temu stare linki nic nie tracą.
+
+### Dostępność znalazła trzy prawdziwe błędy
+
+Test kontrastu liczy WCAG wprost ze wzoru i sprawdza kilkanaście par kolorów
+w obu motywach. Po napisaniu od razu zaświecił na czerwono:
+
+| co | było | wymagane |
+|---|---|---|
+| podpowiedzi (`--fg-dim` na białym) | **2,76:1** | 4,5:1 |
+| obramowania kontrolek (`--line-strong`) | **1,55:1** | 3:1 |
+| ostrzeżenie w ciemnym motywie (biały na pomarańczu) | **2,26:1** | 4,5:1 |
+
+Najciekawszy jest ten trzeci. Powiadomienie ostrzegawcze miało na sztywno
+`color: #fff`, co w jasnym motywie dawało przyzwoite 5,18:1 na ciemnym
+pomarańczu — ale ciemny motyw rozjaśnia pomarańcz, więc biały tekst na nim
+przestaje być czytelny. Naprawa nie polegała na dobraniu innego odcienia,
+tylko na uznaniu, że to jest **para**: `--warn-solid` + `--warn-on`, którą
+ciemny motyw odwraca (ciemny tekst na jasnym tle) zamiast rozjaśniać obie
+strony naraz.
+
+Poza kontrastem: prawdziwe `<label for>` zamiast `div`-a leżącego obok pola,
+`aria-labelledby` przy grupach chipów, wzorzec `radiogroup` z obsługą strzałek
+i roving tabindex (bez tego przejście formularza to kilkadziesiąt Tabów),
+nazwy przycisków licznika z kontekstem („więcej: dorośli" zamiast „więcej"),
+`lang` na podglądzie promptu, żeby czytnik nie czytał angielskiego po polsku.
+
+### Konsekwentne odstępy — jako warunek, nie opinia
+
+„Zrób konsekwentne odstępy" da się zapisać mechanicznie i tak zostało zrobione:
+każdy `gap` i `margin` musi pochodzić ze skali `--s-*`, każdy kolor z tokenu,
+każdy promień i czas animacji też. Naruszenie = czerwony test.
+
+Audyt znalazł tylko jedno odstępstwo w odstępach (`gap: 2px` w liczniku),
+ale przy okazji wyszła gorsza niekonsekwencja: w rzędzie dodawania produktu
+ikona miała 38 px, pola 41 px, a przycisk 30 px. Stąd token `--control`
+i wspólna wysokość kontrolek.
+
+### Czego świadomie nie zrobiłem
+
+Dwie propozycje zostały odrzucone i obie słusznie:
+
+- **Zwijanie sekcji** — „nie".
+- **Ostatnio używane produkty na górze listy** — „w pewnym momencie zacznie
+  się pierdolić, bo szuka się w konkretnym miejscu". To jest dokładnie ten
+  argument, dla którego nie robi się interfejsów, które same się przestawiają:
+  pamięć przestrzenna jest szybsza niż czytanie, a lista, która zmienia
+  kolejność, tę pamięć kasuje. Sortowanie zostaje stałe.
+
 ## 4. Chronologia
 
 | # | Etap | Efekt |
@@ -277,13 +374,14 @@ ustawienie „na ten jeden obiad", tylko preferencja tego, jak się czyta przepi
 | 10 | Dokumentacja | README, ADR-y, ten plik |
 | 11 | Publikacja i CI | repo publiczne, obraz w GHCR, dwa błędy złapane przez CI |
 | 12 | Rytm, tryb „cały dzień", PWA, Pages | instalowalna aplikacja offline |
-| 13 | Tryb ADHD | 94 testy, osobna sekcja promptu o sposobie pisania przepisu |
+| 13 | Tryb ADHD | osobna sekcja promptu o sposobie pisania przepisu |
+| 14 | Student, mealprep, własne produkty, dostępność | 122 testy, paleta pod WCAG AA |
 
 ## 5. Liczby
 
 ```
 kod źródłowy      ~3 900 linii (JS + CSS + HTML)
-testy             ~1 540 linii, 94 testy, 3,2 s
+testy             ~2 100 linii, 122 testy, 3,2 s
 narzędzia         259 linii (bundler + serwer dev)
 zależności        0
 ikony             86 (70 jedzenia + 16 interfejsu), rysowane ręcznie

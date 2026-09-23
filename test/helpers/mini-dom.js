@@ -66,6 +66,12 @@ class FakeNode {
     }
   }
 
+  replaceChildren(...nodes) {
+    for (const child of this.children) child.parent = null;
+    this.children = [];
+    this.append(...nodes);
+  }
+
   remove() {
     if (!this.parent) return;
     this.parent.children = this.parent.children.filter((child) => child !== this);
@@ -270,6 +276,7 @@ export function installDom(html) {
     history: { replaceState() {} },
     location: { hash: '', pathname: '/', search: '', origin: 'http://localhost:5173' },
     navigator: { clipboard: { writeText: async () => {} } },
+    open: () => null,
     isSecureContext: true,
   };
   for (const [name, value] of Object.entries(globals)) {

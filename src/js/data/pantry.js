@@ -99,15 +99,73 @@ export const PANTRY = [
 /** Szybki dostep po id. */
 export const PANTRY_BY_ID = Object.fromEntries(PANTRY.map((p) => [p.id, p]));
 
-/** Produkty pogrupowane w kolejnosci kategorii. */
-export function groupPantry(ids, lang = 'pl') {
+/**
+ * Ikona zastepcza dla kategorii — uzywana, gdy nie udalo sie nic zgadnac
+ * z nazwy wlasnego produktu.
+ */
+export const CATEGORY_ICONS = {
+  veg: 'broccoli',
+  fruit: 'apple',
+  dairy: 'milk',
+  protein: 'chicken',
+  staples: 'bread',
+  extras: 'spices',
+};
+
+/**
+ * Ikony do recznego wyboru przy wlasnym produkcie — klikanie w podglad
+ * przewija te liste. Celowo krotka: przy 70 ikonach wybor z siatki bylby
+ * kolejnym ekranem do zaprojektowania, a osiem sensownych propozycji
+ * na kategorie zalatwia 95% przypadkow.
+ */
+export const CATEGORY_ICON_CHOICES = {
+  veg: ['broccoli', 'tomato', 'carrot', 'onion', 'pepper', 'mushroom', 'cabbage', 'corn'],
+  fruit: ['apple', 'banana', 'lemon', 'orange', 'strawberry', 'grapes', 'avocado', 'pumpkin'],
+  dairy: ['milk', 'cheese', 'egg', 'butter', 'yogurt', 'cream', 'cottage', 'mozzarella'],
+  protein: ['chicken', 'beef', 'pork', 'fish', 'salmon', 'shrimp', 'sausage', 'bacon'],
+  staples: ['bread', 'pasta', 'rice', 'flour', 'oats', 'groats', 'legumes', 'tortilla'],
+  extras: ['spices', 'oil', 'honey', 'chili', 'herbs', 'soy', 'nuts', 'passata'],
+};
+
+/**
+ * Zgaduje produkt z katalogu na podstawie tego, co uzytkownik wpisal.
+ * „ser kozi" trafi w „ser żółty" (ikona sera), „mleko owsiane" w „mleko".
+ * Wygrywa najdluzsze dopasowanie, zeby „masło orzechowe" nie zostalo maslem.
+ */
+export function guessFromName(name) {
+  const query = normalize(name);
+  if (query.length < 3) return null;
+
+  let best = null;
+  for (const item of PANTRY) {
+    const terms = [item.pl, item.en, ...(item.tags ?? '').split(/\s+/)].filter(Boolean);
+    for (const term of terms) {
+      const needle = normalize(term);
+      if (needle.length < 3) continue;
+      if (query.includes(needle) && (best === null || needle.length > best.length)) {
+        best = { item, length: needle.length };
+      }
+    }
+  }
+  return best?.item ?? null;
+}
+
+/**
+ * Produkty pogrupowane w kolejnosci kategorii.
+ * Wlasne produkty uzytkownika wchodza do tych samych grup, na koniec —
+ * w prompcie maja wygladac jak reszta, a nie jak dopisek.
+ */
+export function groupPantry(ids, lang = 'pl', custom = []) {
   return CATEGORIES.map((cat) => ({
     cat,
     label: cat[lang] ?? cat.pl,
-    items: ids
-      .map((id) => PANTRY_BY_ID[id])
-      .filter((item) => item && item.cat === cat.id)
-      .map((item) => item[lang] ?? item.pl),
+    items: [
+      ...ids
+        .map((id) => PANTRY_BY_ID[id])
+        .filter((item) => item && item.cat === cat.id)
+        .map((item) => item[lang] ?? item.pl),
+      ...custom.filter((item) => item.cat === cat.id).map((item) => item.name),
+    ],
   })).filter((group) => group.items.length > 0);
 }
 

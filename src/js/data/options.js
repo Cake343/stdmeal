@@ -14,6 +14,7 @@ export const SCOPES = [
   { id: 'day', pl: 'cały dzień', en: 'a full day' },
   { id: 'days', pl: 'kilka dni', en: 'a few days' },
   { id: 'week', pl: 'cały tydzień', en: 'a whole week' },
+  { id: 'prep', pl: 'mealprep — raz na kilka dni', en: 'meal prep — cook once, eat for days' },
 ];
 
 /** Posilki do zaplanowania. */
